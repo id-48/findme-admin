@@ -38,6 +38,7 @@ import 'package:find_me_admin/screens/Admin/add_image_data__screen.dart';
 import 'package:find_me_admin/utils/Extensions/toast.dart';
 
 import '../main.dart';
+import '../models/places/res_get_userwise_place.dart';
 import '../models/user_model/res_get_all_user.dart';
 import '../network/NetworkUtils.dart';
 import '../utils/Extensions/common.dart';
@@ -257,6 +258,29 @@ Future<CommonResponse> updatePlaceData({required dynamic req}) async {
 }
 
 Future<ResGetAllPlace> getAllPlaces({
+  int? limit,
+  int? page,
+}) async {
+  return ResGetAllPlace.fromJson(await handleResponse(await buildHttpResponse(
+      'places/getAllPlace${limit != null ? "?limit=$limit" : ""}${page != null
+          ? "&pageNo=$page"
+          : ""}',
+      method: HttpMethod.GET)));
+}
+
+Future<ResUserWisePlaces> getUserWisePlaces({
+  int? limit,
+  int? page,
+  String? mono,
+}) async {
+  return ResUserWisePlaces.fromJson(await handleResponse(await buildHttpResponse(
+      'places/getUserWisePlace?mono=$mono${limit != null ? "&limit=$limit" : ""}${page != null
+          ? "&pageNo=$page"
+          : ""}',
+      method: HttpMethod.GET)));
+}
+
+Future<ResGetAllPlace> getUserWisePlace({
   int? limit,
   int? page,
 }) async {
