@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:find_me_admin/models/event/add_event/req_add_event.dart';
+import 'package:find_me_admin/models/event/get_user_wise_event/res_get_user_wise_event.dart';
 import 'package:find_me_admin/models/event/res_get_all_event.dart';
 import 'package:find_me_admin/models/event/update_event/req_update_event.dart';
 import 'package:find_me_admin/models/places/res_get_all_place.dart';
@@ -280,12 +281,13 @@ Future<ResUserWisePlaces> getUserWisePlaces({
       method: HttpMethod.GET)));
 }
 
-Future<ResGetAllPlace> getUserWisePlace({
+Future<ResGetUserWiseEvents> getUserWiseEvent({
   int? limit,
   int? page,
+  String? mono
 }) async {
-  return ResGetAllPlace.fromJson(await handleResponse(await buildHttpResponse(
-      'places/getAllPlace${limit != null ? "?limit=$limit" : ""}${page != null
+  return ResGetUserWiseEvents.fromJson(await handleResponse(await buildHttpResponse(
+      'events/getUserWiseEvent?mono=$mono${limit != null ? "&limit=$limit" : ""}${page != null
           ? "&pageNo=$page"
           : ""}',
       method: HttpMethod.GET)));

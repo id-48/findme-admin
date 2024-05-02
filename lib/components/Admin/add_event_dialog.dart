@@ -1,22 +1,14 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:date_time_picker/date_time_picker.dart';
-import 'package:find_me_admin/models/event/add_event/req_add_event.dart';
-import 'package:find_me_admin/models/event/res_get_all_event.dart';
-import 'package:find_me_admin/utils/Extensions/int_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:find_me_admin/models/colors/add_colors/req_coloros.dart';
-import 'package:find_me_admin/models/colors/get_colors/res_colors.dart';
-import 'package:find_me_admin/models/colors/update_colors/req_update_colors.dart';
 import 'package:find_me_admin/network/RestApis.dart';
 import 'package:find_me_admin/screens/Admin/get_all_events.dart';
-import 'package:find_me_admin/utils/Extensions/string_extensions.dart';
 import 'package:find_me_admin/utils/ResponsiveWidget.dart';
 import 'package:find_me_admin/utils/toast.dart';
-
 import '../../main.dart';
-import '../../models/event/update_event/req_update_event.dart';
+import '../../models/event/get_user_wise_event/res_get_user_wise_event.dart';
 import '../../utils/Colors.dart';
 import '../../utils/Common.dart';
 import '../../utils/Constants.dart';
@@ -27,7 +19,7 @@ import '../../utils/Extensions/text_styles.dart';
 class AddEventDialog extends StatefulWidget {
   static String tag = '/AddEventDialog';
 
-  final Event? event;
+  final UserEvent? event;
   final Function()? onUpdate;
 
   AddEventDialog({this.onUpdate, this.event});

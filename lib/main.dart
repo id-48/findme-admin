@@ -10,13 +10,11 @@ import 'package:find_me_admin/screens/Admin/get_users_screen.dart';
 import 'package:find_me_admin/utils/Extensions/shared_pref.dart';
 import 'package:find_me_admin/utils/RouteGenerator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../appTheme.dart';
 import '../store/AppStore.dart';
 import '../utils/Constants.dart';
 import '../utils/Extensions/common.dart';
 import '../utils/Extensions/int_extensions.dart';
-import 'screens/Showroom_mobile/get_mobile_billing_screen.dart';
 
 AppStore appStore = AppStore();
 
@@ -33,11 +31,14 @@ Future<String> loadBuilderData() async {
   return await rootBundle.loadString('assets/builder.json');
 }
 
+
 void main() async {
   setUrlStrategy(PathUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: firebaseOptions);
   GetAuthCredential().initializeConfig();
+
+  // Hive.init(path);
   sharedPref = await SharedPreferences.getInstance();
   setStringAsync('TOKEN', authToken);
   runApp(MyApp());
@@ -62,8 +63,8 @@ class MyApp extends StatelessWidget {
         initialRoute: getBoolAsync(IS_LOGGED_IN) == false
             ? AdminLoginScreen.route
             : getBoolAsync(IS_ADMIN_LOGGED_IN) == true
-            ? GetUsersScreen.route
-            : getStringAsync(USER_FIRST_ROLE),
+                ? GetUsersScreen.route
+                : getStringAsync(USER_FIRST_ROLE),
 
         routes: route,
         // home: GetMobileBillingScreen(),

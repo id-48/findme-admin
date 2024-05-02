@@ -34,7 +34,7 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
   int totalPage = 1;
   var perPage = 10;
 
-  List<User> lstAllUsers = [];
+  List<AllUser> lstAllUsers = [];
 
   @override
   void initState() {
@@ -146,20 +146,20 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
                                   DataColumn(label: Text("Mobile No")),
                                   DataColumn(label: Text("Latitude")),
                                   DataColumn(label: Text("Longitude")),
-                                  DataColumn(label: Text("Address")),
-                                  DataColumn(label: Text("Country")),
+                                  DataColumn(label: Text("Bio")),
+                                  DataColumn(label: Text("Gender")),
                                   DataColumn(label: Text("Edit")),
                                 ],
                                 rows: lstAllUsers.map((mData) {
                                   return DataRow(cells: [
                                     DataCell(Text(
                                         "${lstAllUsers.indexOf(mData) + 1}")),
-                                    DataCell(Text(mData.userName)),
+                                    DataCell(Text(mData.name)),
                                     DataCell(Text(mData.mono)),
                                     DataCell(Text(mData.lattitude)),
                                     DataCell(Text(mData.longtitude)),
-                                    DataCell(Text(mData.address)),
-                                    DataCell(Text(mData.countryName)),
+                                    DataCell(Text(mData.bio)),
+                                    DataCell(Text(mData.gender)),
                                     DataCell(
                                       Row(
                                         children: [

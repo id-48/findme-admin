@@ -16,6 +16,7 @@ import 'package:find_me_admin/utils/toast.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../main.dart';
+import '../../models/user_model/res_get_all_user.dart';
 import '../../utils/Colors.dart';
 import '../../utils/Common.dart';
 import '../../utils/Constants.dart';
@@ -27,7 +28,7 @@ import '../../widget/selected_image_viewer.dart';
 class AddUserDialog extends StatefulWidget {
   static String tag = '/AddUserDialog';
 
-  final User? userData;
+  final AllUser? userData;
   final Function()? onUpdate;
 
   AddUserDialog({this.onUpdate, this.userData});
@@ -65,14 +66,14 @@ class _AddUserDialogState extends State<AddUserDialog> {
     isUpdate = widget.userData != null;
 
     if (isUpdate) {
-      firstNameCont.text = widget.userData!.firstName.validate();
-      lastNameCont.text = widget.userData!.lastName.validate();
-      userNameCont.text = widget.userData!.userName.validate();
+      // firstNameCont.text = widget.userData!.firstName.validate();
+      // lastNameCont.text = widget.userData!.lastName.validate();
+      userNameCont.text = widget.userData!.name.validate();
       monoCont.text = widget.userData!.mono.validate();
-      addressCont.text = widget.userData!.address.validate();
+      // addressCont.text = widget.userData!.validate();
       lattitudeCont.text = widget.userData!.lattitude.toString().validate();
       longtitudeCont.text = widget.userData!.longtitude.toString().validate();
-      countryNameCont.text = widget.userData!.countryName.validate();
+      // countryNameCont.text = widget.userData!.countryName.validate();
       countryCodeCont.text = widget.userData!.countryCode.validate();
 
       print('widget.userData!.profilePic:::${widget.userData!.profilePic

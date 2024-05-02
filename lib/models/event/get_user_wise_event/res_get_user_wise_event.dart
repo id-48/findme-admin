@@ -43,7 +43,7 @@ class UserEvent {
   String location;
   String lattitude;
   String longtitude;
-  DateTime eventDate;
+  String eventDate;
   String time;
   String description;
   String mono;
@@ -71,7 +71,7 @@ class UserEvent {
         location: json["location"],
         lattitude: json["lattitude"],
         longtitude: json["longtitude"],
-        eventDate: DateTime.parse(json["eventDate"]),
+        eventDate:json["eventDate"],
         time: json["time"],
         description: json["description"],
         mono: json["mono"],
@@ -86,9 +86,7 @@ class UserEvent {
         "location": location,
         "lattitude": lattitude,
         "longtitude": longtitude,
-        "eventDate": "${eventDate.year.toString().padLeft(4, '0')}-${eventDate
-            .month.toString().padLeft(2, '0')}-${eventDate.day.toString()
-            .padLeft(2, '0')}",
+        "eventDate": eventDate,
         "time": time,
         "description": description,
         "mono": mono,
