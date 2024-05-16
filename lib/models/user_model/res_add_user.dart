@@ -4,8 +4,7 @@
 
 import 'dart:convert';
 
-ResAddUser resAddUserFromJson(String str) =>
-    ResAddUser.fromJson(json.decode(str));
+ResAddUser resAddUserFromJson(String str) => ResAddUser.fromJson(json.decode(str));
 
 String resAddUserToJson(ResAddUser data) => json.encode(data.toJson());
 
@@ -20,19 +19,17 @@ class ResAddUser {
     required this.token,
   });
 
-  factory ResAddUser.fromJson(Map<String, dynamic> json) =>
-      ResAddUser(
-        status: json["status"],
-        message: json["message"],
-        token: json["token"],
-      );
+  factory ResAddUser.fromJson(Map<String, dynamic> json) => ResAddUser(
+    status: json["status"],
+    message: json["message"],
+    token: json["token"],
+  );
 
-  Map<String, dynamic> toJson() =>
-      {
-        "status": status,
-        "message": message,
-        "token": token,
-      };
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "message": message,
+    "token": token,
+  };
 }
 //
 // class User {

@@ -1,3 +1,4 @@
+import 'package:find_me_admin/models/admin_model/get_all_admin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:find_me_admin/components/AddButtonComponent.dart';
@@ -17,25 +18,25 @@ import 'package:find_me_admin/utils/Extensions/text_styles.dart';
 import 'package:find_me_admin/utils/ResponsiveWidget.dart';
 import 'package:find_me_admin/utils/toast.dart';
 
+import '../../components/Admin/add_admin_dialog.dart';
 import '../../models/user_model/get_user_profile.dart';
 import '../../models/user_model/res_get_all_user.dart';
 
-class GetUsersScreen extends StatefulWidget {
-  static String route = '/admin/getUsers';
+class RegisterAdminScreen extends StatefulWidget {
+  static String route = '/admin/registerAdmin';
 
   @override
-  State<GetUsersScreen> createState() => _GetUsersScreenState();
+  State<RegisterAdminScreen> createState() => _RegisterAdminScreenState();
 }
 
-class _GetUsersScreenState extends State<GetUsersScreen> {
+class _RegisterAdminScreenState extends State<RegisterAdminScreen> {
   ScrollController horizontalScrollController = ScrollController();
 
   int currentPage = 1;
   int totalPage = 1;
   var perPage = 10;
-  int totalData = 0;
 
-  List<User> lstAllUsers = [];
+  List<Admin> lstAllUsers = [];
 
   @override
   void initState() {
@@ -44,26 +45,19 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
   }
 
   Future<void> init() async {
-    appStore.setSelectedMenuIndex(get_users_index);
-    getUserApiCall();
-    totalPageValue();
+    appStore.setSelectedMenuIndex(get_admin_index);
+     getUserApiCall();
   }
 
   getUserApiCall() async {
-    await getAllUsers(limit: perPage, page: currentPage).then((value) {
+    await getAllAdminApi(limit: perPage, page: currentPage).then((value) {
       if (value.status == true) {
-        if (value.user != null) {
-          lstAllUsers = value.user!;
-          totalData = value.totalUser;
+        if (value.user.isNotEmpty) {
+          lstAllUsers = value.user;
         }
         setState(() {});
       }
     });
-  }
-
-  Future totalPageValue() async {
-    totalPage = (totalData / perPage).ceil();
-    setState(() {});
   }
 
   @override
@@ -73,13 +67,13 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget addUserButton() {
-      return AddButtonComponent("Add User", () {
+    Widget addAdminButton() {
+      return AddButtonComponent("Add Admin", () {
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (BuildContext dialogContext) {
-            return AddUserDialog();
+            return AddAdminDialog(screen: 'registerAdmin');
           },
         );
       });
@@ -103,15 +97,15 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
                           runSpacing: 16,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Text("Add User", style: boldTextStyle(size: 20, color: primaryColor)),
-                            addUserButton(),
+                            Text("Add Admin", style: boldTextStyle(size: 20, color: primaryColor)),
+                            addAdminButton(),
                           ],
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Add User", style: boldTextStyle(size: 20, color: primaryColor)),
-                            addUserButton(),
+                            Text("Add Admin", style: boldTextStyle(size: 20, color: primaryColor)),
+                            addAdminButton(),
                           ],
                         ),
                   Column(
@@ -147,22 +141,16 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
                                 columns: [
                                   DataColumn(label: Text("No")),
                                   DataColumn(label: Text("Name")),
-                                  DataColumn(label: Text("Mobile No")),
-                                  DataColumn(label: Text("Latitude")),
-                                  DataColumn(label: Text("Longitude")),
-                                  DataColumn(label: Text("Bio")),
-                                  DataColumn(label: Text("Gender")),
+                                  DataColumn(label: Text("Email")),
+                                  DataColumn(label: Text("Password")),
                                   DataColumn(label: Text("Edit")),
                                 ],
                                 rows: lstAllUsers.map((mData) {
                                   return DataRow(cells: [
                                     DataCell(Text("${lstAllUsers.indexOf(mData) + 1}")),
-                                    DataCell(Text(mData.name)),
-                                    DataCell(Text(mData.mono)),
-                                    DataCell(Text(mData.lattitude)),
-                                    DataCell(Text(mData.longtitude)),
-                                    DataCell(Text(mData.bio)),
-                                    DataCell(Text(mData.gender)),
+                                    DataCell(Text(mData.adminName)),
+                                    DataCell(Text(mData.email)),
+                                    DataCell(Text(mData.password)),
                                     DataCell(
                                       Row(
                                         children: [
@@ -174,9 +162,9 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
                                                     barrierDismissible: false,
                                                     builder: (BuildContext dialogContext) {
                                                       print('mData ::${mData.toJson()}');
-                                                      return AddUserDialog(
-                                                        userData: mData,
-                                                        onUpdate: () {},
+                                                      return AddAdminDialog(
+                                                        adminData: mData,
+                                                        onUpdate: () {}, screen: 'registerAdmin',
                                                       );
                                                     });
                                               }),
@@ -189,11 +177,11 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
                                                 ToastUtils.showCustomToast(
                                                     context, "Are you sure you want to delete data", "warning");
                                               } else {
-                                                deleteUserApi(userId: mData.id).then((value) {
+                                                deleteAdmin(userId: mData.id).then((value) {
                                                   if (value.status == true) {
                                                     ToastUtils.showCustomToast(context, value.message, "success");
 
-                                                    Navigator.pushNamed(context, GetUsersScreen.route);
+                                                    Navigator.pushNamed(context, RegisterAdminScreen.route);
                                                   } else {
                                                     ToastUtils.showCustomToast(context, value.message, "warning");
                                                   }
@@ -216,11 +204,10 @@ class _GetUsersScreenState extends State<GetUsersScreen> {
                       ),
                       SizedBox(height: 16),
                       paginationWidget(context, currentPage: currentPage, totalPage: totalPage, perPage: perPage,
-                          onUpdate: (currentPageVal, perPageVal) async {
+                          onUpdate: (currentPageVal, perPageVal) {
                         currentPage = currentPageVal;
                         perPage = perPageVal;
-                        await getUserApiCall();
-                        await totalPageValue();
+                        getUserApiCall();
 
                         setState(() {});
                       }),

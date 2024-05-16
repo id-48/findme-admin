@@ -4,8 +4,7 @@
 
 import 'dart:convert';
 
-ResUpdateEvent resUpdateEventFromJson(String str) =>
-    ResUpdateEvent.fromJson(json.decode(str));
+ResUpdateEvent resUpdateEventFromJson(String str) => ResUpdateEvent.fromJson(json.decode(str));
 
 String resUpdateEventToJson(ResUpdateEvent data) => json.encode(data.toJson());
 
@@ -18,15 +17,13 @@ class ResUpdateEvent {
     required this.message,
   });
 
-  factory ResUpdateEvent.fromJson(Map<String, dynamic> json) =>
-      ResUpdateEvent(
-        status: json["status"],
-        message: json["message"],
-      );
+  factory ResUpdateEvent.fromJson(Map<String, dynamic> json) => ResUpdateEvent(
+    status: json["status"],
+    message: json["message"],
+  );
 
-  Map<String, dynamic> toJson() =>
-      {
-        "status": status,
-        "message": message,
-      };
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "message": message,
+  };
 }

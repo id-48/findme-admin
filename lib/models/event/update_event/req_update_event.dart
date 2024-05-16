@@ -4,8 +4,7 @@
 
 import 'dart:convert';
 
-ReqUpdateEvent reqUpdateEventFromJson(String str) =>
-    ReqUpdateEvent.fromJson(json.decode(str));
+ReqUpdateEvent reqUpdateEventFromJson(String str) => ReqUpdateEvent.fromJson(json.decode(str));
 
 String reqUpdateEventToJson(ReqUpdateEvent data) => json.encode(data.toJson());
 
@@ -33,26 +32,26 @@ class ReqUpdateEvent {
   });
 
   factory ReqUpdateEvent.fromJson(Map<String, dynamic> json) => ReqUpdateEvent(
-        eventId: json["eventId"],
-        title: json["title"],
-        location: json["location"],
-        lattitude: json["lattitude"],
-        longtitude: json["longtitude"],
-        eventDate: json["eventDate"],
-        time: json["time"],
-        description: json["description"],
-        mono: json["mono"],
-      );
+    eventId: json["eventId"],
+    title: json["title"],
+    location: json["location"],
+    lattitude: json["lattitude"],
+    longtitude: json["longtitude"],
+    eventDate: json["eventDate"],
+    time: json["time"],
+    description: json["description"],
+    mono: json["mono"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "eventId": eventId,
-        "title": title,
-        "location": location,
-        "lattitude": lattitude,
-        "longtitude": longtitude,
-        "eventDate": eventDate,
-        "time": time,
-        "description": description,
-        "mono": mono,
-      };
+    "eventId": eventId,
+    "title": title,
+    "location": location,
+    "lattitude": lattitude,
+    "longtitude": longtitude,
+    "eventDate": eventDate,
+    "time": time,
+    "description": description,
+    "mono": mono,
+  };
 }

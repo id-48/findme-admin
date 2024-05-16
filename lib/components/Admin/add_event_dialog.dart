@@ -19,7 +19,7 @@ import '../../utils/Extensions/text_styles.dart';
 class AddEventDialog extends StatefulWidget {
   static String tag = '/AddEventDialog';
 
-  final UserEvent? event;
+  final Event? event;
   final Function()? onUpdate;
 
   AddEventDialog({this.onUpdate, this.event});
@@ -58,7 +58,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
       locationCont.text = widget.event!.location;
       lattitudeCont.text = widget.event!.lattitude;
       longtitudeCont.text = widget.event!.longtitude;
-      eventDateCont.text = widget.event!.eventDate;
+      eventDateCont.text = widget.event!.eventDate.toIso8601String();
       timeCont.text = widget.event!.time;
       descriptionCont.text = widget.event!.description;
       monoCont.text = widget.event!.mono;

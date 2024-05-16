@@ -4,16 +4,14 @@
 
 import 'dart:convert';
 
-ResGetUserWiseEvents resGetUserWiseEventsFromJson(String str) =>
-    ResGetUserWiseEvents.fromJson(json.decode(str));
+ResGetUserWiseEvents resGetUserWiseEventsFromJson(String str) => ResGetUserWiseEvents.fromJson(json.decode(str));
 
-String resGetUserWiseEventsToJson(ResGetUserWiseEvents data) =>
-    json.encode(data.toJson());
+String resGetUserWiseEventsToJson(ResGetUserWiseEvents data) => json.encode(data.toJson());
 
 class ResGetUserWiseEvents {
   bool status;
   String message;
-  List<UserEvent> events;
+  List<Event> events;
 
   ResGetUserWiseEvents({
     required this.status,
@@ -21,36 +19,33 @@ class ResGetUserWiseEvents {
     required this.events,
   });
 
-  factory ResGetUserWiseEvents.fromJson(Map<String, dynamic> json) =>
-      ResGetUserWiseEvents(
-        status: json["status"],
-        message: json["message"],
-        events: List<UserEvent>.from(
-            json["events"].map((x) => UserEvent.fromJson(x))),
-      );
+  factory ResGetUserWiseEvents.fromJson(Map<String, dynamic> json) => ResGetUserWiseEvents(
+    status: json["status"],
+    message: json["message"],
+    events: List<Event>.from(json["events"].map((x) => Event.fromJson(x))),
+  );
 
-  Map<String, dynamic> toJson() =>
-      {
-        "status": status,
-        "message": message,
-        "events": List<dynamic>.from(events.map((x) => x.toJson())),
-      };
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "message": message,
+    "events": List<dynamic>.from(events.map((x) => x.toJson())),
+  };
 }
 
-class UserEvent {
+class Event {
   String id;
   String title;
   String location;
   String lattitude;
   String longtitude;
-  String eventDate;
+  DateTime eventDate;
   String time;
   String description;
   String mono;
   DateTime createdAt;
   DateTime updatedAt;
 
-  UserEvent({
+  Event({
     required this.id,
     required this.title,
     required this.location,
@@ -64,33 +59,31 @@ class UserEvent {
     required this.updatedAt,
   });
 
-  factory UserEvent.fromJson(Map<String, dynamic> json) =>
-      UserEvent(
-        id: json["_id"],
-        title: json["title"],
-        location: json["location"],
-        lattitude: json["lattitude"],
-        longtitude: json["longtitude"],
-        eventDate:json["eventDate"],
-        time: json["time"],
-        description: json["description"],
-        mono: json["mono"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
-      );
+  factory Event.fromJson(Map<String, dynamic> json) => Event(
+    id: json["_id"],
+    title: json["title"],
+    location: json["location"],
+    lattitude: json["lattitude"],
+    longtitude: json["longtitude"],
+    eventDate: DateTime.parse(json["eventDate"]),
+    time: json["time"],
+    description: json["description"],
+    mono: json["mono"],
+    createdAt: DateTime.parse(json["createdAt"]),
+    updatedAt: DateTime.parse(json["updatedAt"]),
+  );
 
-  Map<String, dynamic> toJson() =>
-      {
-        "_id": id,
-        "title": title,
-        "location": location,
-        "lattitude": lattitude,
-        "longtitude": longtitude,
-        "eventDate": eventDate,
-        "time": time,
-        "description": description,
-        "mono": mono,
-        "createdAt": createdAt.toIso8601String(),
-        "updatedAt": updatedAt.toIso8601String(),
-      };
+  Map<String, dynamic> toJson() => {
+    "_id": id,
+    "title": title,
+    "location": location,
+    "lattitude": lattitude,
+    "longtitude": longtitude,
+    "eventDate": eventDate,
+    "time": time,
+    "description": description,
+    "mono": mono,
+    "createdAt": createdAt.toIso8601String(),
+    "updatedAt": updatedAt.toIso8601String(),
+  };
 }

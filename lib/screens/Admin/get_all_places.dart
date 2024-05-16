@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:find_me_admin/models/places/res_get_all_place.dart';
+import 'package:find_me_admin/models/user_model/get_user_profile.dart';
 import 'package:find_me_admin/utils/Extensions/int_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -19,7 +20,6 @@ import 'package:find_me_admin/utils/Extensions/shared_pref.dart';
 import 'package:find_me_admin/utils/Extensions/text_styles.dart';
 import 'package:find_me_admin/utils/ResponsiveWidget.dart';
 import 'package:find_me_admin/utils/toast.dart';
-import 'package:hive/hive.dart';
 import '../../models/user_model/res_get_all_user.dart';
 
 class GetAllPlacesScreen extends StatefulWidget {
@@ -35,10 +35,10 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
   int currentPage = 1;
   int totalPage = 1;
   var perPage = 10;
-  List<AllUser> lstAllUsers = [];
+  List<User> lstAllUsers = [];
   List<Place> lstPlaceData = [];
   bool isLoading = false;
-  late Box<dynamic> hiveBox;
+  int totalData = 0;
 
   @override
   void initState() {
@@ -51,7 +51,8 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
 
     appStore.setSelectedMenuIndex(get_all_places);
     getAllPlacesApiCall();
-    getUserApiCall();
+    await getUserApiCall();
+    await totalPageValue();
   }
 
   getAllPlacesApiCall() async {
@@ -68,7 +69,6 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
 
     await getUserWisePlaces(limit: perPage, page: currentPage, mono: mono).then((value) {
       if (value.status == true) {
-        print('=======================> ${value.places}');
         lstPlace = value.places;
         return value.places;
       } else {}
@@ -81,10 +81,18 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
     await getAllUsers(limit: perPage, page: currentPage).then((value) {
       if (value.status == true) {
         print('lstAllUsers ::${lstAllUsers}');
-        lstAllUsers = value.user;
+        if (value.user != null) {
+          lstAllUsers = value.user!;
+          totalData = value.totalUser;
+        }
         setState(() {});
       }
     });
+  }
+
+  Future totalPageValue() async {
+    totalPage = (totalData / perPage).ceil();
+    setState(() {});
   }
 
   @override
@@ -140,10 +148,10 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
                       SizedBox(height: 16),
                       Container(
                         decoration: BoxDecoration(
-                            // color: Colors.white,
-                            color: primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(defaultRadius),
-                            // boxShadow: commonBoxShadow()
+                          // color: Colors.white,
+                          color: primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(defaultRadius),
+                          // boxShadow: commonBoxShadow()
                         ),
                         child: Column(
                           children: [
@@ -163,7 +171,7 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
                                       child: Text("Gender", style: boldTextStyle(size: 15, color: primaryColor))),
                                   SizedBox(
                                       width: 200,
-                                      child: Text("CountryCode", style: boldTextStyle(size: 15, color: primaryColor))),
+                                      child: Text("Country Name", style: boldTextStyle(size: 15, color: primaryColor))),
                                 ],
                               ),
                             ),
@@ -193,10 +201,11 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
                       ),
                       SizedBox(height: 16),
                       paginationWidget(context, currentPage: currentPage, totalPage: totalPage, perPage: perPage,
-                          onUpdate: (currentPageVal, perPageVal) {
+                          onUpdate: (currentPageVal, perPageVal) async {
                         currentPage = currentPageVal;
                         perPage = perPageVal;
-                        getAllPlacesApiCall();
+                        await getUserApiCall();
+                        await totalPageValue();
 
                         setState(() {});
                       }),
@@ -217,7 +226,7 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
     });
   }
 
-  Widget createCollapsedColumn(int index, AllUser userData) {
+  Widget createCollapsedColumn(int index, User userData) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +255,7 @@ class _GetAllPlacesScreenState extends State<GetAllPlacesScreen> {
         SizedBox(
           width: 200,
           child: Text(
-            userData.countryCode,
+            userData.countryName,
             style: boldTextStyle(),
           ),
         )

@@ -40,7 +40,6 @@ void main() async {
 
   // Hive.init(path);
   sharedPref = await SharedPreferences.getInstance();
-  setStringAsync('TOKEN', authToken);
   runApp(MyApp());
 }
 

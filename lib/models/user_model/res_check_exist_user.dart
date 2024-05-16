@@ -4,34 +4,30 @@
 
 import 'dart:convert';
 
-ResCheckExistUser resCheckExistUserFromJson(String str) =>
-    ResCheckExistUser.fromJson(json.decode(str));
+ResCheckExistUser resCheckExistUserFromJson(String str) => ResCheckExistUser.fromJson(json.decode(str));
 
-String resCheckExistUserToJson(ResCheckExistUser data) =>
-    json.encode(data.toJson());
+String resCheckExistUserToJson(ResCheckExistUser data) => json.encode(data.toJson());
 
 class ResCheckExistUser {
   bool status;
   String message;
-  String token;
+  String? token;
 
   ResCheckExistUser({
     required this.status,
     required this.message,
-    required this.token,
+    this.token,
   });
 
-  factory ResCheckExistUser.fromJson(Map<String, dynamic> json) =>
-      ResCheckExistUser(
-        status: json["status"],
-        message: json["message"],
-        token: json["token"],
-      );
+  factory ResCheckExistUser.fromJson(Map<String, dynamic> json) => ResCheckExistUser(
+    status: json["status"],
+    message: json["message"],
+    token:json.containsKey('token')? json["token"]:null,
+  );
 
-  Map<String, dynamic> toJson() =>
-      {
-        "status": status,
-        "message": message,
-        "token": token,
-      };
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "message": message,
+    "token": token,
+  };
 }

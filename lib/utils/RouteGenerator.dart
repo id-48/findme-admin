@@ -1,3 +1,4 @@
+import 'package:find_me_admin/screens/Admin/register_admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:find_me_admin/screens/Admin/get_all_events.dart';
 import 'package:find_me_admin/screens/Admin/get_all_places.dart';
@@ -17,57 +18,48 @@ Route<dynamic>? onGenerateRoute(settings) {
   final queryParameters = uriData.queryParameters;
 
   MaterialPageRoute adminLoginRoute = MaterialPageRoute(
-      builder: (context) => AdminLoginScreen(),
-      settings: RouteSettings(name: AdminLoginScreen.route));
-  MaterialPageRoute getUserRoute = MaterialPageRoute(
-      builder: (context) => GetUsersScreen(),
-      settings: RouteSettings(name: GetUsersScreen.route));
-
+      builder: (context) => AdminLoginScreen(), settings: RouteSettings(name: AdminLoginScreen.route));
+  MaterialPageRoute getUserRoute =
+      MaterialPageRoute(builder: (context) => GetUsersScreen(), settings: RouteSettings(name: GetUsersScreen.route));
 
   if (settings.name == GetUsersScreen.route) {
     return appStore.isAdminLoggedIn != false
-        ? MaterialPageRoute(
-        builder: (context) => GetUsersScreen(), settings: settings)
+        ? MaterialPageRoute(builder: (context) => GetUsersScreen(), settings: settings)
         : getUserRoute;
   }
 
   if (settings.name == GetAllEventsScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => GetAllEventsScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => GetAllEventsScreen(), settings: settings);
   }
 
   if (settings.name == GetAllPlacesScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => GetAllPlacesScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => GetAllPlacesScreen(), settings: settings);
   }
 
   if (settings.name == AddJackBaseScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => AddJackBaseScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => AddJackBaseScreen(), settings: settings);
   }
 
   if (settings.name == AddFootRestScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => AddFootRestScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => AddFootRestScreen(), settings: settings);
   }
 
   if (settings.name == ImageDataScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => ImageDataScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => ImageDataScreen(), settings: settings);
   }
   if (settings.name == AddProductScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => AddProductScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => AddProductScreen(), settings: settings);
   }
 
   if (settings.name == BillingDataScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => BillingDataScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => BillingDataScreen(), settings: settings);
+  }
+  if (settings.name == RegisterAdminScreen.route) {
+    return MaterialPageRoute(builder: (context) => RegisterAdminScreen(), settings: settings);
   }
 
   if (settings.name == GetBillingScreen.route) {
-    return MaterialPageRoute(
-        builder: (context) => GetBillingScreen(), settings: settings);
+    return MaterialPageRoute(builder: (context) => GetBillingScreen(), settings: settings);
   }
 
   return null;

@@ -42,6 +42,7 @@ Future<Response> buildHttpResponse(String endPoint,
     {HttpMethod method = HttpMethod.GET, Map? request, String? req}) async {
   if (await isNetworkAvailable()) {
     var headers = {'token': getStringAsync('TOKEN')};
+    print('headers ::${headers}');
     Uri url = buildBaseUrl(endPoint);
 
     try {

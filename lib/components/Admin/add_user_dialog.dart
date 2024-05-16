@@ -14,6 +14,10 @@ import 'package:find_me_admin/utils/Extensions/string_extensions.dart';
 import 'package:find_me_admin/utils/ResponsiveWidget.dart';
 import 'package:find_me_admin/utils/toast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '../../main.dart';
 import '../../models/user_model/res_get_all_user.dart';
@@ -28,7 +32,7 @@ import '../../widget/selected_image_viewer.dart';
 class AddUserDialog extends StatefulWidget {
   static String tag = '/AddUserDialog';
 
-  final AllUser? userData;
+  final User? userData;
   final Function()? onUpdate;
 
   AddUserDialog({this.onUpdate, this.userData});
@@ -40,8 +44,6 @@ class AddUserDialog extends StatefulWidget {
 class _AddUserDialogState extends State<AddUserDialog> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  TextEditingController firstNameCont = TextEditingController();
-  TextEditingController lastNameCont = TextEditingController();
   TextEditingController userNameCont = TextEditingController();
   TextEditingController monoCont = TextEditingController();
   TextEditingController addressCont = TextEditingController();
@@ -49,9 +51,17 @@ class _AddUserDialogState extends State<AddUserDialog> {
   TextEditingController longtitudeCont = TextEditingController();
   TextEditingController countryNameCont = TextEditingController();
   TextEditingController countryCodeCont = TextEditingController();
+  TextEditingController ageCont = TextEditingController();
+  TextEditingController emailCont = TextEditingController();
+  TextEditingController bioCont = TextEditingController();
+  TextEditingController genderCont = TextEditingController();
+  TextEditingController lastActivateCont = TextEditingController();
+  TextEditingController fcmTokenCont = TextEditingController();
+
   XFile? imageXFile;
   Uint8List? imgUint8list;
   String pickupCountryCode = defaultPhoneCode;
+  List<String> lstSelectedLanguages = [];
 
   bool isUpdate = false;
   final borderRadius = BorderRadius.all(Radius.circular(9.0));
@@ -66,22 +76,26 @@ class _AddUserDialogState extends State<AddUserDialog> {
     isUpdate = widget.userData != null;
 
     if (isUpdate) {
-      // firstNameCont.text = widget.userData!.firstName.validate();
-      // lastNameCont.text = widget.userData!.lastName.validate();
-      userNameCont.text = widget.userData!.name.validate();
-      monoCont.text = widget.userData!.mono.validate();
-      // addressCont.text = widget.userData!.validate();
-      lattitudeCont.text = widget.userData!.lattitude.toString().validate();
-      longtitudeCont.text = widget.userData!.longtitude.toString().validate();
-      // countryNameCont.text = widget.userData!.countryName.validate();
-      countryCodeCont.text = widget.userData!.countryCode.validate();
-
-      print('widget.userData!.profilePic:::${widget.userData!.profilePic
-          .toString()}');
+      print('GET ::=lstSelectedLanguages == > ${widget.userData!.languages}');
+      fcmTokenCont.text = widget.userData!.fcmToken.isNotEmpty ? widget.userData!.fcmToken : '';
+      ageCont.text = widget.userData!.age.isNotEmpty ? widget.userData!.age : '';
+      emailCont.text = widget.userData!.email.isNotEmpty ? widget.userData!.email : '';
+      userNameCont.text = widget.userData!.name.isNotEmpty ? widget.userData!.name : '';
+      bioCont.text = widget.userData!.bio.isNotEmpty ? widget.userData!.bio : '';
+      monoCont.text = widget.userData!.mono.isNotEmpty ? widget.userData!.mono : '';
+      lattitudeCont.text = widget.userData!.lattitude.isNotEmpty ? widget.userData!.lattitude : '';
+      longtitudeCont.text = widget.userData!.longtitude.isNotEmpty ? widget.userData!.longtitude : '';
+      countryCodeCont.text = widget.userData!.countryCode.isNotEmpty ? widget.userData!.countryCode : '';
+      genderCont.text = widget.userData!.gender.isNotEmpty ? widget.userData!.gender : '';
+      // addressCont.text=widget.userData!.address.isNotEmpty?widget.userData!.address:'';
+      // lastActivateCont.text = DateFormat('dd-mm-yyyy').format(widget.userData!.lastActivate ?? DateTime.now());
+      countryNameCont.text = widget.userData!.countryName.isNotEmpty ? widget.userData!.countryName : '';
+      print('widget.userData!.profilePic:::${widget.userData!.profilePic.toString()}');
+      if (widget.userData!.languages.isNotEmpty) {
+        lstSelectedLanguages.addAll(widget.userData!.languages);
+      }
       if (widget.userData!.profilePic.isNotEmpty) {
-        imgUint8list = await imageDataURLtoUint8List(
-            mBaseUrl + widget.userData!.profilePic[0]);
-        print('imgUint8list :::${imgUint8list.toString()}');
+        imgUint8list = await imageDataURLtoUint8List(mBaseUrl + widget.userData!.profilePic[0]);
       }
       setState(() {});
     }
@@ -101,60 +115,75 @@ class _AddUserDialogState extends State<AddUserDialog> {
     if (_formKey.currentState!.validate()) {
       appStore.setLoading(true);
 
-      String firstName = firstNameCont.text.trim();
-      String lastName = lastNameCont.text.trim();
-      String userName = userNameCont.text.trim();
+      String fcmToken = fcmTokenCont.text.trim();
+      String age = ageCont.text.trim();
+      String email = emailCont.text.trim();
+      String name = userNameCont.text.trim();
+      String bio = bioCont.text.trim();
       String mono = monoCont.text.trim();
-      String address = addressCont.text.trim();
       String lattitude = lattitudeCont.text.trim();
       String longtitude = longtitudeCont.text.trim();
-      String countryName = countryNameCont.text.trim();
       String countryCode = countryCodeCont.text.trim();
-      String fcmToken = '';
+      String gender = genderCont.text.trim();
+      String address = addressCont.text.trim();
+      // String lastActivate = lastActivateCont.text.trim();
+      String countryName = countryNameCont.text.trim();
 
       await addUserData(
           context: context,
-          firstName: firstName,
-          lastName: lastName,
-          userName: userName,
+          fcmToken: fcmToken,
+          age: age,
+          email: email,
+          name: name,
+          bio: bio,
           mono: mono,
-          address: address,
           lattitude: lattitude,
           longtitude: longtitude,
-          countryName: countryName,
           countryCode: countryCode,
-          fcmToken: '',
-          profilePic: imgUint8list != null ? [imgUint8list!] : []);
+          gender: gender,
+          address: address,
+          lastActivate: DateTime.now().toIso8601String(),
+          countryName: countryName,
+          profilePic: imgUint8list != null ? [imgUint8list!] : [],
+          lstSelectedLanguages: lstSelectedLanguages);
     }
   }
 
   UpdateUserApi() async {
+    print('lstSelectedLanguages -------------:::${lstSelectedLanguages.toList()}');
     if (_formKey.currentState!.validate()) {
       appStore.setLoading(true);
-      String firstName = firstNameCont.text.trim();
-      String lastName = lastNameCont.text.trim();
-      String userName = userNameCont.text.trim();
+      String fcmToken = fcmTokenCont.text.trim();
+      String age = ageCont.text.trim();
+      String email = emailCont.text.trim();
+      String name = userNameCont.text.trim();
+      String bio = bioCont.text.trim();
       String mono = monoCont.text.trim();
-      String address = addressCont.text.trim();
       String lattitude = lattitudeCont.text.trim();
       String longtitude = longtitudeCont.text.trim();
-      String countryName = countryNameCont.text.trim();
       String countryCode = countryCodeCont.text.trim();
-      String fcmToken = '';
+      String gender = genderCont.text.trim();
+      String address = addressCont.text.trim();
+      String lastActivate = DateTime.now().toIso8601String();
+      String countryName = countryNameCont.text.trim();
       await updateUserData(
           context: context,
           userId: widget.userData!.id,
-          firstName: firstName,
-          lastName: lastName,
-          userName: userName,
+          fcmToken: fcmToken,
+          age: age,
+          email: email,
+          name: name,
+          bio: bio,
           mono: mono,
-          address: address,
           lattitude: lattitude,
           longtitude: longtitude,
-          countryName: countryName,
           countryCode: countryCode,
-          fcmToken: fcmToken,
-          profilePic: imgUint8list != null ? [imgUint8list!] : []);
+          gender: gender,
+          address: address,
+          lastActivate: lastActivate,
+          countryName: countryName,
+          profilePic: imgUint8list != null ? [imgUint8list!] : [],
+          lstSelectedLanguages: lstSelectedLanguages);
     }
   }
 
@@ -170,8 +199,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(isUpdate ? 'Update User' : "Add User Details",
-              style: boldTextStyle(color: primaryColor, size: 20)),
+          Text(isUpdate ? 'Update User' : "Add User Details", style: boldTextStyle(color: primaryColor, size: 20)),
           IconButton(
             icon: Icon(Icons.close),
             padding: EdgeInsets.zero,
@@ -197,43 +225,6 @@ class _AddUserDialogState extends State<AddUserDialog> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("First Name", style: primaryTextStyle()),
-                                  SizedBox(height: 8),
-                                  AppTextField(
-                                    controller: firstNameCont,
-                                    textFieldType: TextFieldType.NAME,
-                                    decoration: commonInputDecoration(),
-                                    textInputAction: TextInputAction.next,
-                                    errorThisFieldRequired: "This field is required",
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Last Name", style: primaryTextStyle()),
-                                  SizedBox(height: 8),
-                                  AppTextField(
-                                    controller: lastNameCont,
-                                    textFieldType: TextFieldType.NAME,
-                                    decoration: commonInputDecoration(),
-                                    textInputAction: TextInputAction.next,
-                                    errorThisFieldRequired: "This field is required",
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
                         SizedBox(height: 16),
                         Text("User name", style: primaryTextStyle()),
                         SizedBox(height: 8),
@@ -266,23 +257,15 @@ class _AddUserDialogState extends State<AddUserDialog> {
                                       showOnlyCountryWhenClosed: false,
                                       alignLeft: false,
                                       textStyle: primaryTextStyle(),
-                                      dialogBackgroundColor: Theme
-                                          .of(context)
-                                          .cardColor,
+                                      dialogBackgroundColor: Theme.of(context).cardColor,
                                       barrierColor: Colors.black12,
                                       dialogTextStyle: primaryTextStyle(),
                                       searchDecoration: InputDecoration(
-                                        iconColor: Theme
-                                            .of(context)
-                                            .dividerColor,
+                                        iconColor: Theme.of(context).dividerColor,
                                         enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(color: Theme
-                                                .of(context)
-                                                .dividerColor)),
+                                            borderSide: BorderSide(color: Theme.of(context).dividerColor)),
                                         focusedBorder:
-                                        UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: primaryColor)),
+                                            UnderlineInputBorder(borderSide: BorderSide(color: primaryColor)),
                                       ),
                                       searchStyle: primaryTextStyle(),
                                       onInit: (c) {
@@ -292,17 +275,14 @@ class _AddUserDialogState extends State<AddUserDialog> {
                                         pickupCountryCode = c.dialCode!;
                                       },
                                     ),
-                                    VerticalDivider(
-                                        color: Colors.grey.withOpacity(0.5)),
+                                    VerticalDivider(color: Colors.grey.withOpacity(0.5)),
                                   ],
                                 ),
                               )),
                           validator: (value) {
                             if (value!.trim().isEmpty) {
                               return errorThisFieldRequired;
-                            } else if (value
-                                .trim()
-                                .length != 10) {
+                            } else if (value.trim().length != 10) {
                               return error10digit;
                             }
                             return null;
@@ -320,6 +300,44 @@ class _AddUserDialogState extends State<AddUserDialog> {
                           decoration: commonInputDecoration(),
                           textInputAction: TextInputAction.next,
                           errorThisFieldRequired: "This field is required",
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Email", style: primaryTextStyle()),
+                                  SizedBox(height: 8),
+                                  AppTextField(
+                                    controller: emailCont,
+                                    textFieldType: TextFieldType.EMAIL,
+                                    decoration: commonInputDecoration(),
+                                    textInputAction: TextInputAction.next,
+                                    errorThisFieldRequired: "This field is required",
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Gender", style: primaryTextStyle()),
+                                  SizedBox(height: 8),
+                                  AppTextField(
+                                    controller: genderCont,
+                                    textFieldType: TextFieldType.NAME,
+                                    decoration: commonInputDecoration(),
+                                    textInputAction: TextInputAction.next,
+                                    errorThisFieldRequired: "This field is required",
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 16),
                         Row(
@@ -366,8 +384,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Country Code",
-                                      style: primaryTextStyle()),
+                                  Text("Country Code", style: primaryTextStyle()),
                                   SizedBox(height: 8),
                                   AppTextField(
                                     controller: countryCodeCont,
@@ -384,8 +401,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Country Name",
-                                      style: primaryTextStyle()),
+                                  Text("Country Name", style: primaryTextStyle()),
                                   SizedBox(height: 8),
                                   AppTextField(
                                     controller: countryNameCont,
@@ -400,6 +416,83 @@ class _AddUserDialogState extends State<AddUserDialog> {
                           ],
                         ),
                         SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Bio", style: primaryTextStyle()),
+                                  SizedBox(height: 8),
+                                  AppTextField(
+                                    controller: bioCont,
+                                    textFieldType: TextFieldType.NAME,
+                                    decoration: commonInputDecoration(),
+                                    textInputAction: TextInputAction.next,
+                                    errorThisFieldRequired: "This field is required",
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Fcm Token", style: primaryTextStyle()),
+                                  SizedBox(height: 8),
+                                  AppTextField(
+                                    controller: fcmTokenCont,
+                                    textFieldType: TextFieldType.NAME,
+                                    decoration: commonInputDecoration(),
+                                    textInputAction: TextInputAction.next,
+                                    errorThisFieldRequired: "This field is required",
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        Text('Select Languages', style: primaryTextStyle()),
+                        SizedBox(height: 5),
+                        MultiSelectDialogField(
+                          searchHint: "Languages",
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please select language!';
+                            }
+                            return null;
+                          },
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25), border: Border.all(color: Color(0xFFB3B3B3))),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Select Languages", style: TextStyle(color: primaryColor, fontSize: 20)),
+                              IconButton(
+                                icon: Icon(Icons.close),
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  Navigator.pop(context, false);
+                                },
+                              ),
+                            ],
+                          ),
+                          dialogWidth: 500,
+                          dialogHeight: 500,
+                          checkColor: Colors.white,
+                          selectedColor: primaryColor,
+                          items: lstLanguages.map((String e) => MultiSelectItem(e, e)).toList(),
+                          listType: MultiSelectListType.LIST,
+                          initialValue: lstSelectedLanguages,
+                          onConfirm: (values) {
+                            lstSelectedLanguages.clear();
+                            lstSelectedLanguages.addAll(values);
+                            setState(() {});
+                          },
+                        ),
+                        SizedBox(height: 16),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
@@ -412,23 +505,19 @@ class _AddUserDialogState extends State<AddUserDialog> {
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            8.0),
+                                        borderRadius: BorderRadius.circular(8.0),
                                         side: BorderSide(color: viewLineColor)),
                                     elevation: 0,
                                     backgroundColor: Colors.transparent,
                                     shadowColor: Colors.transparent),
-                                child: Text("Select File",
-                                    style: boldTextStyle(color: Colors.grey)),
+                                child: Text("Select File", style: boldTextStyle(color: Colors.grey)),
                                 onPressed: () {
                                   getImage();
                                 },
                               ),
                             ),
                             SizedBox(height: 10),
-                            SelectedImageViewer(
-                                res: imgUint8list != null ? [imgUint8list!] : [
-                                ], setState: setState),
+                            SelectedImageViewer(res: imgUint8list != null ? [imgUint8list!] : [], setState: setState),
                             SizedBox(height: 16),
                           ],
                         ),

@@ -1,3 +1,4 @@
+import 'package:find_me_admin/screens/Admin/register_admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:find_me_admin/models/models.dart';
@@ -7,7 +8,10 @@ import 'package:find_me_admin/utils/DataProvider.dart';
 import 'package:find_me_admin/utils/Extensions/toast.dart';
 import 'package:find_me_admin/utils/Images.dart';
 
+import '../../components/AddButtonComponent.dart';
+import '../../components/Admin/add_admin_dialog.dart';
 import '../../main.dart';
+import '../../models/user_model/res_login_user.dart';
 import '../../network/RestApis.dart';
 import '../../utils/Colors.dart';
 import '../../utils/Common.dart';
@@ -59,8 +63,7 @@ class AdminLoginScreenState extends State<AdminLoginScreen> {
                           //   width: 500,
                           // ),
                           SizedBox(height: 30),
-                          Text(mAppName, style: boldTextStyle(color: Colors
-                              .white, size: 20)),
+                          Text(mAppName, style: boldTextStyle(color: Colors.white, size: 20)),
                         ],
                       ),
                     ),
@@ -70,8 +73,7 @@ class AdminLoginScreenState extends State<AdminLoginScreen> {
             ),
           Expanded(
             child: Container(
-              padding: EdgeInsets.only(
-                  left: 50, right: 50, top: 50, bottom: 16),
+              padding: EdgeInsets.only(left: 50, right: 50, top: 50, bottom: 16),
               child: Stack(
                 alignment: AlignmentDirectional.center,
                 children: [
@@ -84,11 +86,9 @@ class AdminLoginScreenState extends State<AdminLoginScreen> {
                         children: [
                           Text("Sign in", style: boldTextStyle(size: 30)),
                           SizedBox(height: 16),
-                          Text(
-                              "Sign in your account", style: secondaryTextStyle(
-                              size: 16)),
+                          Text("Sign in your account", style: secondaryTextStyle(size: 16)),
                           SizedBox(height: 50),
-                          Text("Enter showroom Id", style: primaryTextStyle()),
+                          Text("Enter email Id", style: primaryTextStyle()),
                           SizedBox(height: 8),
                           AppTextField(
                             controller: emailController,
@@ -105,6 +105,21 @@ class AdminLoginScreenState extends State<AdminLoginScreen> {
                             decoration: commonInputDecoration(),
                           ),
                           SizedBox(height: 30),
+                          // InkWell(
+                          //   onTap: () {
+                          //     showDialog(
+                          //       context: context,
+                          //       barrierDismissible: false,
+                          //       builder: (BuildContext dialogContext) {
+                          //         return AddAdminDialog(
+                          //           screen: 'login',
+                          //         );
+                          //       },
+                          //     );
+                          //   },
+                          //   child: Text('Register Admin!',
+                          //       style: primaryTextStyle(color: primaryColor, decoration: TextDecoration.underline)),
+                          // ),
                           Align(
                             alignment: Alignment.centerRight,
                             child: commonButton("Login", () async {
@@ -114,32 +129,41 @@ class AdminLoginScreenState extends State<AdminLoginScreen> {
                               if (emailVal.isNotEmpty) {
                                 if (passVal.isNotEmpty) {
                                   appStore.setLoading(true);
-
-                                  if (GetAuthCredential().email == emailVal &&
-                                      GetAuthCredential().password == passVal) {
-                                    await appStore.setLoggedIn(true);
-                                    await appStore.setAdminLoggedIn(true);
-                                    ToastUtils.showCustomToast(
-                                        context, "Login successful", "success");
-                                    appStore.setLoading(false);
-                                    setString("userLogin", "admin");
-                                    setString("showroomId", "admin");
-                                    Navigator.pushNamed(
-                                        context, GetUsersScreen.route);
+                                  var req = {'email': emailVal, 'password': passVal};
+                                  ResLoginUser resLoginUser = await loginAdminUser(req: req);
+                                  if (resLoginUser.status) {
+                                    if (resLoginUser.token.isNotEmpty) {
+                                      setStringAsync('TOKEN', resLoginUser.token);
+                                      print('resLoginUser.token :::${resLoginUser.token}');
+                                      await appStore.setLoggedIn(true);
+                                      await appStore.setAdminLoggedIn(true);
+                                      ToastUtils.showCustomToast(context, "Login successful", "success");
+                                      appStore.setLoading(false);
+                                      setString("userLogin", "admin");
+                                      setString("showroomId", "admin");
+                                      Navigator.pushNamed(context, GetUsersScreen.route);
+                                    }
                                   } else {
-                                    ToastUtils.showCustomToast(
-                                        context,
-                                        "Please enter valid email and password!",
-                                        "warning");
+                                    ToastUtils.showCustomToast(context, resLoginUser.reason, "warning");
                                   }
+                                  // if (GetAuthCredential().email == emailVal &&
+                                  //     GetAuthCredential().password == passVal) {
+                                  //   await appStore.setLoggedIn(true);
+                                  //   await appStore.setAdminLoggedIn(true);
+                                  //   ToastUtils.showCustomToast(context, "Login successful", "success");
+                                  //   appStore.setLoading(false);
+                                  //   setString("userLogin", "admin");
+                                  //   setString("showroomId", "admin");
+                                  //   Navigator.pushNamed(context, GetUsersScreen.route);
+                                  // } else {
+                                  //   ToastUtils.showCustomToast(
+                                  //       context, "Please enter valid email and password!", "warning");
+                                  // }
                                 } else {
-                                  ToastUtils.showCustomToast(
-                                      context, "Please enter Password.",
-                                      "warning");
+                                  ToastUtils.showCustomToast(context, "Please enter Password.", "warning");
                                 }
                               } else {
-                                ToastUtils.showCustomToast(
-                                    context, "Please enter empId.", "warning");
+                                ToastUtils.showCustomToast(context, "Please enter empId.", "warning");
                               }
                             }, width: 200),
                           ),
@@ -147,10 +171,7 @@ class AdminLoginScreenState extends State<AdminLoginScreen> {
                       ),
                     ),
                   ),
-                  Observer(builder: (context) =>
-                  appStore.isLoading
-                      ? loaderWidget()
-                      : SizedBox()),
+                  Observer(builder: (context) => appStore.isLoading ? loaderWidget() : SizedBox()),
                 ],
               ),
             ),

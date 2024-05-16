@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:find_me_admin/models/admin_model/get_all_admin.dart';
 import 'package:find_me_admin/models/event/add_event/req_add_event.dart';
 import 'package:find_me_admin/models/event/get_user_wise_event/res_get_user_wise_event.dart';
 import 'package:find_me_admin/models/event/res_get_all_event.dart';
@@ -41,11 +42,11 @@ import 'package:find_me_admin/utils/Extensions/toast.dart';
 import '../main.dart';
 import '../models/places/res_get_userwise_place.dart';
 import '../models/user_model/res_get_all_user.dart';
+import '../models/user_model/res_login_user.dart';
 import '../network/NetworkUtils.dart';
 import '../utils/Extensions/common.dart';
 
-Future<MultipartRequest> getMultiPartRequest(String endPoint,
-    {String? baseUrl}) async {
+Future<MultipartRequest> getMultiPartRequest(String endPoint, {String? baseUrl}) async {
   String url = '${baseUrl ?? buildBaseUrl(endPoint).toString()}';
   return MultipartRequest('POST', Uri.parse(url));
 }
@@ -69,50 +70,77 @@ Future sendMultiPartRequest(MultipartRequest multiPartRequest,
 
 ///Login
 
-Future<ResShowroom> loginShowroom(
-    {required String showroomID, required String password}) async {
-  return ResShowroom.fromJson(await handleResponse(await buildHttpResponse(
-      'showroom/loginShowroom?showroomId=$showroomID&password=$password',
-      method: HttpMethod.GET)));
+Future<ResLoginUser> loginAdminUser({required dynamic req}) async {
+  return ResLoginUser.fromJson(
+      await handleResponse(await buildHttpResponse('admin/loginAdmin', request: req, method: HttpMethod.POST)));
+}
+
+Future<CommonResponse> registerAdmin({required dynamic req}) async {
+  return CommonResponse.fromJson(
+      await handleResponse(await buildHttpResponse('admin/registerAdmin', request: req, method: HttpMethod.POST)));
+}
+
+Future<CommonResponse> updateAdmin({required dynamic req}) async {
+  return CommonResponse.fromJson(
+      await handleResponse(await buildHttpResponse('admin/updateAdmin', request: req, method: HttpMethod.POST)));
+}
+
+Future<ResGetAllAdmin> getAllAdminApi({
+  required int limit,
+  required int page,
+}) async {
+  return ResGetAllAdmin.fromJson(await handleResponse(
+      await buildHttpResponse('admin/getAllAdmin?limit=$limit&pageNo=$page', method: HttpMethod.POST)));
+}
+
+Future<CommonResponse> deleteAdmin({required String userId}) async {
+  return CommonResponse.fromJson(
+      await handleResponse(await buildHttpResponse('admin/deleteAdmin?userId=$userId', method: HttpMethod.POST)));
 }
 
 /// user data
 
 Future addUserData({
   required BuildContext context,
-  required String firstName,
-  required String lastName,
-  required String userName,
+  required String fcmToken,
+  required String age,
+  required String email,
+  required String name,
+  required String bio,
   required String mono,
-  required String address,
   required String lattitude,
   required String longtitude,
-  required String countryName,
   required String countryCode,
-  required String fcmToken,
+  required String gender,
+  required String address,
+  required String lastActivate,
+  required String countryName,
   required List<Uint8List> profilePic,
+  required List<String> lstSelectedLanguages,
 }) async {
-  MultipartRequest multiPartRequest = await getMultiPartRequest(
-      'users/addUser');
+  MultipartRequest multiPartRequest = await getMultiPartRequest('users/addUser');
 
-  multiPartRequest.fields["firstName"] = firstName;
-  multiPartRequest.fields["lastName"] = lastName;
-  multiPartRequest.fields["userName"] = userName;
-  multiPartRequest.fields["mono"] = mono;
-  multiPartRequest.fields["address"] = address;
-  multiPartRequest.fields["lattitude"] = lattitude;
-  multiPartRequest.fields["longtitude"] = longtitude;
-  multiPartRequest.fields["countryName"] = countryName;
-  multiPartRequest.fields["countryCode"] = countryCode;
-  multiPartRequest.fields["fcmToken"] = fcmToken;
+  multiPartRequest.fields['fcmToken'] = fcmToken;
+  multiPartRequest.fields['age'] = age;
+  multiPartRequest.fields['email'] = email;
+  multiPartRequest.fields['name'] = name;
+  multiPartRequest.fields['bio'] = bio;
+  multiPartRequest.fields['mono'] = mono;
+  multiPartRequest.fields['lattitude'] = lattitude;
+  multiPartRequest.fields['longtitude'] = longtitude;
+  multiPartRequest.fields['countryCode'] = countryCode;
+  multiPartRequest.fields['gender'] = gender;
+  multiPartRequest.fields['address'] = address;
+  multiPartRequest.fields['lastActivate'] = lastActivate;
+  multiPartRequest.fields['countryName'] = countryName;
+
+  for (int i = 0; i < lstSelectedLanguages.length; i++) {
+    multiPartRequest.files.add(MultipartFile.fromString('languages', lstSelectedLanguages[i]));
+  }
 
   if (profilePic.isNotEmpty) {
-    multiPartRequest.files.add(
-        MultipartFile.fromBytes('profilePic', profilePic[0],
-            filename: DateTime
-                .now()
-                .microsecondsSinceEpoch
-                .toString() + ".png"));
+    multiPartRequest.files.add(MultipartFile.fromBytes('profilePic', profilePic[0],
+        filename: DateTime.now().microsecondsSinceEpoch.toString() + ".png"));
   }
 
   await sendMultiPartRequest(multiPartRequest, onSuccess: (data) async {
@@ -140,41 +168,47 @@ Future addUserData({
 
 Future updateUserData({
   required BuildContext context,
+  required String fcmToken,
   required String userId,
-  required String firstName,
-  required String lastName,
-  required String userName,
+  required String age,
+  required String email,
+  required String name,
+  required String bio,
   required String mono,
-  required String address,
   required String lattitude,
   required String longtitude,
-  required String countryName,
   required String countryCode,
-  required String fcmToken,
+  required String gender,
+  required String address,
+  required String lastActivate,
+  required String countryName,
   required List<Uint8List> profilePic,
+  required List<String> lstSelectedLanguages,
 }) async {
-  MultipartRequest multiPartRequest = await getMultiPartRequest(
-      'users/updateUser');
+  MultipartRequest multiPartRequest = await getMultiPartRequest('users/updateUser');
+  print('lstSelectedLanguages === > ${lstSelectedLanguages}');
+  multiPartRequest.fields['fcmToken'] = fcmToken;
+  multiPartRequest.fields['userId'] = userId;
+  multiPartRequest.fields['age'] = age;
+  multiPartRequest.fields['email'] = email;
+  multiPartRequest.fields['name'] = name;
+  multiPartRequest.fields['bio'] = bio;
+  multiPartRequest.fields['mono'] = mono;
+  multiPartRequest.fields['lattitude'] = lattitude;
+  multiPartRequest.fields['longtitude'] = longtitude;
+  multiPartRequest.fields['countryCode'] = countryCode;
+  multiPartRequest.fields['gender'] = gender;
+  multiPartRequest.fields['address'] = address;
+  multiPartRequest.fields['lastActivate'] = lastActivate;
+  multiPartRequest.fields['countryName'] = countryName;
 
-  multiPartRequest.fields["userId"] = userId;
-  multiPartRequest.fields["firstName"] = firstName;
-  multiPartRequest.fields["lastName"] = lastName;
-  multiPartRequest.fields["userName"] = userName;
-  multiPartRequest.fields["mono"] = mono;
-  multiPartRequest.fields["address"] = address;
-  multiPartRequest.fields["lattitude"] = lattitude;
-  multiPartRequest.fields["longtitude"] = longtitude;
-  multiPartRequest.fields["countryName"] = countryName;
-  multiPartRequest.fields["countryCode"] = countryCode;
-  multiPartRequest.fields["fcmToken"] = fcmToken;
-
+  for (int i = 0; i < lstSelectedLanguages.length; i++) {
+    print('fields :::::::${lstSelectedLanguages[i]}');
+    multiPartRequest.files.add(MultipartFile.fromString('languages', lstSelectedLanguages[i]));
+  }
   if (profilePic.isNotEmpty) {
-    multiPartRequest.files.add(
-        MultipartFile.fromBytes('profilePic', profilePic[0],
-            filename: DateTime
-                .now()
-                .microsecondsSinceEpoch
-                .toString() + ".png"));
+    multiPartRequest.files.add(MultipartFile.fromBytes('profilePic', profilePic[0],
+        filename: DateTime.now().microsecondsSinceEpoch.toString() + ".png"));
   }
 
   await sendMultiPartRequest(multiPartRequest, onSuccess: (data) async {
@@ -202,60 +236,51 @@ Future<ResGetAllUser> getAllUsers({
   required int page,
 }) async {
   return ResGetAllUser.fromJson(await handleResponse(
-      await buildHttpResponse('users/getAllUser?limit=$limit&pageNo=$page',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('users/getAllUser?limit=$limit&pageNo=$page', method: HttpMethod.GET)));
 }
 
 Future<CommonResponse> deleteUserApi({required String userId}) async {
   return CommonResponse.fromJson(
-      await handleResponse(await buildHttpResponse(
-          'users/deleteUser?userId=$userId', method: HttpMethod.GET)));
+      await handleResponse(await buildHttpResponse('users/deleteUser?userId=$userId', method: HttpMethod.GET)));
 }
 
 /// event data
 Future<CommonResponse> addEvent({required dynamic req}) async {
   print('req: ${req}');
-  return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse(
-          'events/addEvent', request: req, method: HttpMethod.POST)));
+  return CommonResponse.fromJson(
+      await handleResponse(await buildHttpResponse('events/addEvent', request: req, method: HttpMethod.POST)));
 }
 
 Future<CommonResponse> updateEvent({required dynamic req}) async {
   print('req ::${req.toString()}');
-  return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse(
-          'events/updateEvent', request: req, method: HttpMethod.POST)));
+  return CommonResponse.fromJson(
+      await handleResponse(await buildHttpResponse('events/updateEvent', request: req, method: HttpMethod.POST)));
 }
 
-Future<ResGetAllEvents> getAllEvents({
+Future<ResAllEvents> getAllEvents({
   int? limit,
   int? page,
 }) async {
-  return ResGetAllEvents.fromJson(await handleResponse(await buildHttpResponse(
-      'events/getAllEvent${limit != null ? "?limit=$limit" : ""}${page != null
-          ? "&pageNo=$page"
-          : ""}',
+  return ResAllEvents.fromJson(await handleResponse(await buildHttpResponse(
+      'events/getAllEvent${limit != null ? "?limit=$limit" : ""}${page != null ? "&pageNo=$page" : ""}',
       method: HttpMethod.GET)));
 }
 
 Future<CommonResponse> deleteEvents({required String eventId}) async {
   return CommonResponse.fromJson(
-      await handleResponse(await buildHttpResponse(
-          'events/deleteEvent?eventId=$eventId', method: HttpMethod.GET)));
+      await handleResponse(await buildHttpResponse('events/deleteEvent?eventId=$eventId', method: HttpMethod.GET)));
 }
 
 ///place Data
 
 Future<CommonResponse> addPlaceData({required dynamic req}) async {
-  return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse(
-          'places/addPlace', request: req, method: HttpMethod.POST)));
+  return CommonResponse.fromJson(
+      await handleResponse(await buildHttpResponse('places/addPlace', request: req, method: HttpMethod.POST)));
 }
 
 Future<CommonResponse> updatePlaceData({required dynamic req}) async {
-  return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse(
-          'places/updatePlace', request: req, method: HttpMethod.POST)));
+  return CommonResponse.fromJson(
+      await handleResponse(await buildHttpResponse('places/updatePlace', request: req, method: HttpMethod.POST)));
 }
 
 Future<ResGetAllPlace> getAllPlaces({
@@ -263,9 +288,7 @@ Future<ResGetAllPlace> getAllPlaces({
   int? page,
 }) async {
   return ResGetAllPlace.fromJson(await handleResponse(await buildHttpResponse(
-      'places/getAllPlace${limit != null ? "?limit=$limit" : ""}${page != null
-          ? "&pageNo=$page"
-          : ""}',
+      'places/getAllPlace${limit != null ? "?limit=$limit" : ""}${page != null ? "&pageNo=$page" : ""}',
       method: HttpMethod.GET)));
 }
 
@@ -275,42 +298,31 @@ Future<ResUserWisePlaces> getUserWisePlaces({
   String? mono,
 }) async {
   return ResUserWisePlaces.fromJson(await handleResponse(await buildHttpResponse(
-      'places/getUserWisePlace?mono=$mono${limit != null ? "&limit=$limit" : ""}${page != null
-          ? "&pageNo=$page"
-          : ""}',
+      'places/getUserWisePlace?mono=$mono${limit != null ? "&limit=$limit" : ""}${page != null ? "&pageNo=$page" : ""}',
       method: HttpMethod.GET)));
 }
 
-Future<ResGetUserWiseEvents> getUserWiseEvent({
-  int? limit,
-  int? page,
-  String? mono
-}) async {
+Future<ResGetUserWiseEvents> getUserWiseEvent({int? limit, int? page, String? mono}) async {
   return ResGetUserWiseEvents.fromJson(await handleResponse(await buildHttpResponse(
-      'events/getUserWiseEvent?mono=$mono${limit != null ? "&limit=$limit" : ""}${page != null
-          ? "&pageNo=$page"
-          : ""}',
+      'events/getUserWiseEvent?mono=$mono${limit != null ? "&limit=$limit" : ""}${page != null ? "&pageNo=$page" : ""}',
       method: HttpMethod.GET)));
 }
 
 Future<CommonResponse> deletePlaces({required String placeId}) async {
   return CommonResponse.fromJson(
-      await handleResponse(await buildHttpResponse(
-          'places/deletePlace?placeId=$placeId', method: HttpMethod.GET)));
+      await handleResponse(await buildHttpResponse('places/deletePlace?placeId=$placeId', method: HttpMethod.GET)));
 }
 
 ///Footrest Data
 
 Future<CommonResponse> addFootrest({required ReqFootrest req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('footRest/addFootRest', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('footRest/addFootRest', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<CommonResponse> updateFootrest({required ReqUpdateFootrest req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('footRest/updateFootRest', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('footRest/updateFootRest', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<ResFootrest> getFootrest({
@@ -318,30 +330,25 @@ Future<ResFootrest> getFootrest({
   int? page,
 }) async {
   return ResFootrest.fromJson(await handleResponse(await buildHttpResponse(
-      'footRest/getFootRest${limit != null ? "?limit=$limit" : ""}${page != null
-          ? "&pageNo=$page"
-          : ""}',
+      'footRest/getFootRest${limit != null ? "?limit=$limit" : ""}${page != null ? "&pageNo=$page" : ""}',
       method: HttpMethod.GET)));
 }
 
 Future<CommonResponse> deleteFootrest({required String footRestId}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('footRest/deleteFootRest?footRestId=$footRestId',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('footRest/deleteFootRest?footRestId=$footRestId', method: HttpMethod.GET)));
 }
 
 ///JackBase Data
 
 Future<CommonResponse> addJackBase({required ReqJackbase req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('jackBase/addJackBase', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('jackBase/addJackBase', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<CommonResponse> updateJackBase({required ReqUpdateJackbase req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('jackBase/updateJackBase', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('jackBase/updateJackBase', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<ResJackbase> getJackBase({
@@ -349,16 +356,13 @@ Future<ResJackbase> getJackBase({
   int? page,
 }) async {
   return ResJackbase.fromJson(await handleResponse(await buildHttpResponse(
-      'jackBase/getJackBase${limit != null ? "?limit=$limit" : ""}${page != null
-          ? "&pageNo=$page"
-          : ""}',
+      'jackBase/getJackBase${limit != null ? "?limit=$limit" : ""}${page != null ? "&pageNo=$page" : ""}',
       method: HttpMethod.GET)));
 }
 
 Future<CommonResponse> deleteJackBase({required String jackBaseId}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('jackBase/deleteJackBase?jackBaseId=$jackBaseId',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('jackBase/deleteJackBase?jackBaseId=$jackBaseId', method: HttpMethod.GET)));
 }
 
 ///Image Data
@@ -368,20 +372,15 @@ Future addImageData({
   required List<Uint8List> image,
 }) async {
   ///  multi
-  MultipartRequest multiPartRequest = await getMultiPartRequest(
-      'imageData/addImageData');
+  MultipartRequest multiPartRequest = await getMultiPartRequest('imageData/addImageData');
 
   if (image.isNotEmpty) {
     for (int i = 0; i < image.length; i++) {
       multiPartRequest.files.add(MultipartFile.fromBytes('image', image[i],
-          filename: DateTime
-              .now()
-              .microsecondsSinceEpoch
-              .toString() + ".png"));
+          filename: DateTime.now().microsecondsSinceEpoch.toString() + ".png"));
     }
   }
-  print('REQ Image data: ${multiPartRequest
-      .fields}  \n files -->${multiPartRequest.files}');
+  print('REQ Image data: ${multiPartRequest.fields}  \n files -->${multiPartRequest.files}');
   await sendMultiPartRequest(multiPartRequest, onSuccess: (data) async {
     appStore.setLoading(false);
     if (data != null) {
@@ -406,18 +405,14 @@ Future updateImageData({
   required String imageDataId,
   required List<Uint8List> image,
 }) async {
-  MultipartRequest multiPartRequest = await getMultiPartRequest(
-      'imageData/updateImageData');
+  MultipartRequest multiPartRequest = await getMultiPartRequest('imageData/updateImageData');
 
   multiPartRequest.fields["imageDataId"] = imageDataId;
 
   if (image.isNotEmpty) {
     for (int i = 0; i < image.length; i++) {
       multiPartRequest.files.add(MultipartFile.fromBytes('image', image[i],
-          filename: DateTime
-              .now()
-              .microsecondsSinceEpoch
-              .toString() + ".png"));
+          filename: DateTime.now().microsecondsSinceEpoch.toString() + ".png"));
     }
   }
 
@@ -446,29 +441,25 @@ Future<ResImageData> getImageData({
   int? page,
 }) async {
   return ResImageData.fromJson(await handleResponse(await buildHttpResponse(
-      'imageData/getImageData${limit != null ? "?limit=$limit" : ""}${page !=
-          null ? "&pageNo=$page" : ""}',
+      'imageData/getImageData${limit != null ? "?limit=$limit" : ""}${page != null ? "&pageNo=$page" : ""}',
       method: HttpMethod.GET)));
 }
 
 Future<CommonResponse> deleteImageData({required String imageId}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('imageData/deleteImageData?imageId=$imageId',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('imageData/deleteImageData?imageId=$imageId', method: HttpMethod.GET)));
 }
 
 ///Product Data
 
 Future<CommonResponse> addProduct({required ReqAddProduct req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('product/addProduct', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('product/addProduct', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<CommonResponse> updateProduct({required ReqUpdateProduct req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('product/updateProduct', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('product/updateProduct', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<ResGetProduct> getProduct({
@@ -476,36 +467,31 @@ Future<ResGetProduct> getProduct({
   required int page,
 }) async {
   return ResGetProduct.fromJson(await handleResponse(
-      await buildHttpResponse('product/getProduct?limit=$limit&pageNo=$page',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('product/getProduct?limit=$limit&pageNo=$page', method: HttpMethod.GET)));
 }
 
 Future<ResGetProduct> getSearchProduct({
   required String searchVal,
 }) async {
   return ResGetProduct.fromJson(await handleResponse(
-      await buildHttpResponse('product/searchProduct?productName=$searchVal',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('product/searchProduct?productName=$searchVal', method: HttpMethod.GET)));
 }
 
 Future<CommonResponse> deleteProduct({required String productId}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('product/deleteProduct/?productId=$productId',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('product/deleteProduct/?productId=$productId', method: HttpMethod.GET)));
 }
 
 ///Billing Data
 
 Future<CommonResponse> addBilling({required ReqBilling req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('billing/addBilling', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('billing/addBilling', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<CommonResponse> updateBilling({required ReqUpdateBilling req}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('billing/updateBilling', request: req.toJson(),
-          method: HttpMethod.POST)));
+      await buildHttpResponse('billing/updateBilling', request: req.toJson(), method: HttpMethod.POST)));
 }
 
 Future<ResBilling> getBilling({
@@ -513,12 +499,10 @@ Future<ResBilling> getBilling({
   required int page,
 }) async {
   return ResBilling.fromJson(await handleResponse(
-      await buildHttpResponse('billing/getBilling?limit=$limit&pageNo=$page',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('billing/getBilling?limit=$limit&pageNo=$page', method: HttpMethod.GET)));
 }
 
-Future<ResBilling> getShowroomWiseBilling(
-    {required int limit, required int page, required String showroomId}) async {
+Future<ResBilling> getShowroomWiseBilling({required int limit, required int page, required String showroomId}) async {
   return ResBilling.fromJson(await handleResponse(await buildHttpResponse(
       'billing/showroomWiseBilling?limit=$limit&pageNo=$page&showroomId=$showroomId',
       method: HttpMethod.GET)));
@@ -526,6 +510,5 @@ Future<ResBilling> getShowroomWiseBilling(
 
 Future<CommonResponse> deleteBilling({required String billingId}) async {
   return CommonResponse.fromJson(await handleResponse(
-      await buildHttpResponse('billing/deleteBilling?billingId=$billingId',
-          method: HttpMethod.GET)));
+      await buildHttpResponse('billing/deleteBilling?billingId=$billingId', method: HttpMethod.GET)));
 }

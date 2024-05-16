@@ -86,9 +86,9 @@ class BodyCornerWidgetState extends State<BodyCornerWidget> {
                 child: Row(
                   children: [
                     10.width,
-                    Image.asset(app_logo_white,
-                        height: 30, width: 30, fit: BoxFit.cover),
-                    10.width,
+                    // Image.asset(app_logo_white,
+                    //     height: 30, width: 30, fit: BoxFit.cover),
+                    // 10.width,
                     if (!ResponsiveWidget.isSmallScreen(context))
                       Text(mAppName,
                           style: boldTextStyle(color: Colors.white, size: 18)),

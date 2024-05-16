@@ -1,4 +1,3 @@
-import 'package:find_me_admin/models/event/res_get_all_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:find_me_admin/components/AddButtonComponent.dart';
@@ -16,7 +15,9 @@ import 'package:find_me_admin/utils/Extensions/shared_pref.dart';
 import 'package:find_me_admin/utils/Extensions/text_styles.dart';
 import 'package:find_me_admin/utils/ResponsiveWidget.dart';
 import 'package:find_me_admin/utils/toast.dart';
+import 'package:intl/intl.dart';
 import '../../models/event/get_user_wise_event/res_get_user_wise_event.dart';
+import '../../models/user_model/get_user_profile.dart';
 import '../../models/user_model/res_get_all_user.dart';
 
 class GetAllEventsScreen extends StatefulWidget {
@@ -32,7 +33,8 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
   int currentPage = 1;
   int totalPage = 1;
   var perPage = 10;
-  List<AllUser> lstAllUsers = [];
+  List<User> lstAllUsers = [];
+  int totalData = 0;
 
   // List<Event> lstAllEventData = [];
 
@@ -45,19 +47,16 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
   Future<void> init() async {
     appStore.setSelectedMenuIndex(get_all_event);
     // getAllEventsApi();
-    getUserApiCall();
+    await getUserApiCall();
+    await totalPageValue();
   }
 
-  Future<List<UserEvent>> getUserWiseEventApiCall(String mono) async {
-    List<UserEvent> lstEvents = [];
-    setState(() {});
+  Future<List<Event>> getUserWiseEventApiCall(String mono) async {
+    List<Event> lstEvents = [];
 
     await getUserWiseEvent(limit: perPage, page: currentPage, mono: mono).then((value) {
       if (value.status == true) {
-        print('=======================> ${value.events}');
-
         lstEvents = value.events;
-        setState(() {});
         return value.events;
       } else {}
       return lstEvents;
@@ -68,11 +67,20 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
   getUserApiCall() async {
     await getAllUsers(limit: perPage, page: currentPage).then((value) {
       if (value.status == true) {
-        lstAllUsers = value.user;
+        if (value.user != null) {
+          lstAllUsers = value.user!;
+          totalData = value.totalUser;
+        }
         setState(() {});
       }
     });
   }
+
+  Future totalPageValue() async {
+    totalPage = (totalData / perPage).ceil();
+    setState(() {});
+  }
+
   // getAllEventsApi() async {
   //   await getAllEvents(limit: perPage, page: currentPage).then((value) {
   //     if (value.status == true) {
@@ -159,7 +167,7 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
                                       child: Text("Gender", style: boldTextStyle(size: 15, color: primaryColor))),
                                   SizedBox(
                                       width: 200,
-                                      child: Text("CountryCode", style: boldTextStyle(size: 15, color: primaryColor))),
+                                      child: Text("Country Name", style: boldTextStyle(size: 15, color: primaryColor))),
                                 ],
                               ),
                             ),
@@ -189,10 +197,11 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
                       ),
                       SizedBox(height: 16),
                       paginationWidget(context, currentPage: currentPage, totalPage: totalPage, perPage: perPage,
-                          onUpdate: (currentPageVal, perPageVal) {
+                          onUpdate: (currentPageVal, perPageVal) async {
                         currentPage = currentPageVal;
                         perPage = perPageVal;
-                        // getAllEventsApi();
+                        await getUserApiCall();
+                        await totalPageValue();
 
                         setState(() {});
                       }),
@@ -213,7 +222,7 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
     });
   }
 
-  Widget createCollapsedColumn(int index, AllUser userData) {
+  Widget createCollapsedColumn(int index, User userData) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,7 +251,7 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
         SizedBox(
           width: 200,
           child: Text(
-            userData.countryCode,
+            userData.countryName,
             style: boldTextStyle(),
           ),
         )
@@ -251,7 +260,6 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
   }
 
   Widget createExpandedColumn(String mono) {
-    print('mono :::${mono}');
     // lstPlace = hiveBox.getAt(index) ?? [];
     // print(' index $index lstPlace ::${lstPlace.toList()}');
     return Column(
@@ -268,10 +276,10 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
         SizedBox(
           height: 10,
         ),
-        FutureBuilder<List<UserEvent>>(
+        FutureBuilder<List<Event>>(
             future: getUserWiseEventApiCall(mono),
             builder: (context, snapshot) {
-              List<UserEvent> lstEvent = snapshot.data ?? [];
+              List<Event> lstEvent = snapshot.data ?? [];
 
               if (lstEvent.isNotEmpty) {
                 return ConstrainedBox(
@@ -305,7 +313,7 @@ class _GetAllEventsScreenState extends State<GetAllEventsScreen> {
                         DataCell(Text(mData.lattitude)),
                         DataCell(Text(mData.longtitude)),
                         DataCell(Text(mData.location)),
-                        DataCell(Text(mData.eventDate)),
+                        DataCell(Text(DateFormat('dd/MM/yyyy').format(mData.eventDate))),
                         DataCell(Text(mData.description)),
                         DataCell(
                           Row(
