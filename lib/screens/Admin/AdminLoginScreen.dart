@@ -132,18 +132,22 @@ class AdminLoginScreenState extends State<AdminLoginScreen> {
                                   var req = {'email': emailVal, 'password': passVal};
                                   ResLoginUser resLoginUser = await loginAdminUser(req: req);
                                   if (resLoginUser.status) {
-                                    if (resLoginUser.token.isNotEmpty) {
-                                      setStringAsync('TOKEN', resLoginUser.token);
-                                      print('resLoginUser.token :::${resLoginUser.token}');
-                                      await appStore.setLoggedIn(true);
-                                      await appStore.setAdminLoggedIn(true);
-                                      ToastUtils.showCustomToast(context, "Login successful", "success");
-                                      appStore.setLoading(false);
-                                      setString("userLogin", "admin");
-                                      setString("showroomId", "admin");
-                                      Navigator.pushNamed(context, GetUsersScreen.route);
+                                    if(resLoginUser.token!=null){
+                                      if (resLoginUser.token!.isNotEmpty) {
+                                        setStringAsync('TOKEN', resLoginUser.token!);
+                                        print('resLoginUser.token :::${resLoginUser.token}');
+                                        await appStore.setLoggedIn(true);
+                                        await appStore.setAdminLoggedIn(true);
+                                        ToastUtils.showCustomToast(context, "Login successful", "success");
+                                        appStore.setLoading(false);
+                                        setString("userLogin", "admin");
+                                        setString("showroomId", "admin");
+                                        Navigator.pushNamed(context, GetUsersScreen.route);
+                                      }
                                     }
+
                                   } else {
+                                    appStore.setLoading(false);
                                     ToastUtils.showCustomToast(context, resLoginUser.reason, "warning");
                                   }
                                   // if (GetAuthCredential().email == emailVal &&

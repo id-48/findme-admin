@@ -7,7 +7,7 @@ const currencyCodeDefault = 'INR';
 
 /// Don't add slash at the end of the url
 const DOMAIN_URL = '';
-const mBaseUrl = "http://18.207.126.22:3000/";
+const mBaseUrl = "http://54.91.186.145:3000/";
 
 const mOneSignalAppId = '';
 const mOneSignalRestKey = '';
