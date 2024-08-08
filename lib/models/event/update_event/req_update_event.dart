@@ -16,6 +16,7 @@ class ReqUpdateEvent {
   String longtitude;
   String eventDate;
   String time;
+  String eventImages;
   String description;
   String mono;
 
@@ -26,32 +27,35 @@ class ReqUpdateEvent {
     required this.lattitude,
     required this.longtitude,
     required this.eventDate,
+    required this.eventImages,
     required this.time,
     required this.description,
     required this.mono,
   });
 
   factory ReqUpdateEvent.fromJson(Map<String, dynamic> json) => ReqUpdateEvent(
-    eventId: json["eventId"],
-    title: json["title"],
-    location: json["location"],
-    lattitude: json["lattitude"],
-    longtitude: json["longtitude"],
-    eventDate: json["eventDate"],
-    time: json["time"],
-    description: json["description"],
-    mono: json["mono"],
-  );
+        eventId: json["eventId"],
+        title: json["title"],
+        location: json["location"],
+        lattitude: json["lattitude"],
+        longtitude: json["longtitude"],
+        eventDate: json["eventDate"],
+        eventImages: json["eventImages"],
+        time: json["time"],
+        description: json["description"],
+        mono: json["mono"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "eventId": eventId,
-    "title": title,
-    "location": location,
-    "lattitude": lattitude,
-    "longtitude": longtitude,
-    "eventDate": eventDate,
-    "time": time,
-    "description": description,
-    "mono": mono,
-  };
+        "eventId": eventId,
+        "title": title,
+        "location": location,
+        "lattitude": lattitude,
+        "longtitude": longtitude,
+        "eventDate": eventDate,
+        "eventImages": eventImages,
+        "time": time,
+        "description": description,
+        "mono": mono,
+      };
 }

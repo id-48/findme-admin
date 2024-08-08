@@ -187,6 +187,26 @@ class _AddEventDialogState extends State<AddEventDialog> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Text("Image", style: primaryTextStyle()),
+                                  SizedBox(height: 8),
+                                  Container(
+                                    height: 200,
+                                    width: 200,
+                                    // decoration: BoxDecoration(image: DecorationImage(image:)),
+                                    color: Colors.grey.shade300,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text("Location", style: primaryTextStyle()),
                                   SizedBox(height: 8),
                                   AppTextField(
@@ -208,8 +228,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Mobile Number",
-                                      style: primaryTextStyle()),
+                                  Text("Mobile Number", style: primaryTextStyle()),
                                   SizedBox(height: 8),
                                   AppTextField(
                                     controller: monoCont,
@@ -240,27 +259,21 @@ class _AddEventDialogState extends State<AddEventDialog> {
                                                       .of(context)
                                                       .dividerColor,
                                                   enabledBorder: UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color: Theme
-                                                              .of(context)
-                                                              .dividerColor)),
+                                                      borderSide: BorderSide(color: Theme
+                                                          .of(context)
+                                                          .dividerColor)),
                                                   focusedBorder:
-                                                  UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color: primaryColor)),
+                                                  UnderlineInputBorder(borderSide: BorderSide(color: primaryColor)),
                                                 ),
                                                 searchStyle: primaryTextStyle(),
                                                 onInit: (c) {
-                                                  pickupCountryCode =
-                                                  c!.dialCode!;
+                                                  pickupCountryCode = c!.dialCode!;
                                                 },
                                                 onChanged: (c) {
-                                                  pickupCountryCode =
-                                                  c.dialCode!;
+                                                  pickupCountryCode = c.dialCode!;
                                                 },
                                               ),
-                                              VerticalDivider(color: Colors.grey
-                                                  .withOpacity(0.5)),
+                                              VerticalDivider(color: Colors.grey.withOpacity(0.5)),
                                             ],
                                           ),
                                         )),
@@ -340,9 +353,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                                       setState(() {});
                                     },
                                     decoration:
-                                    commonInputDecoration(
-                                        suffixIcon: Icon(Icons.date_range),
-                                        hintText: "Date"),
+                                    commonInputDecoration(suffixIcon: Icon(Icons.date_range), hintText: "Date"),
                                   ),
                                 ],
                               ),
@@ -373,8 +384,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                      "Description", style: primaryTextStyle()),
+                                  Text("Description", style: primaryTextStyle()),
                                   SizedBox(height: 8),
                                   AppTextField(
                                     controller: descriptionCont,

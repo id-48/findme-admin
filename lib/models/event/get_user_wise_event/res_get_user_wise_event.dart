@@ -42,6 +42,7 @@ class Event {
   String time;
   String description;
   String mono;
+  List eventImages;
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -53,6 +54,7 @@ class Event {
     required this.longtitude,
     required this.eventDate,
     required this.time,
+    required this.eventImages,
     required this.description,
     required this.mono,
     required this.createdAt,
@@ -65,6 +67,7 @@ class Event {
     location: json["location"],
     lattitude: json["lattitude"],
     longtitude: json["longtitude"],
+    eventImages: json["eventImages"],
     eventDate: DateTime.parse(json["eventDate"]),
     time: json["time"],
     description: json["description"],
@@ -79,6 +82,7 @@ class Event {
     "location": location,
     "lattitude": lattitude,
     "longtitude": longtitude,
+    "eventImages": eventImages,
     "eventDate": eventDate,
     "time": time,
     "description": description,
