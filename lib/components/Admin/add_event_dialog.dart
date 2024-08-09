@@ -15,6 +15,7 @@ import '../../utils/Constants.dart';
 import '../../utils/Extensions/app_textfield.dart';
 import '../../utils/Extensions/constants.dart';
 import '../../utils/Extensions/text_styles.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddEventDialog extends StatefulWidget {
   static String tag = '/AddEventDialog';
@@ -40,9 +41,11 @@ class _AddEventDialogState extends State<AddEventDialog> {
   TextEditingController timeCont = TextEditingController();
   TextEditingController descriptionCont = TextEditingController();
   TextEditingController monoCont = TextEditingController();
-
+  XFile? eventImage;
+  Uint8List? eventImageList;
   bool isUpdate = false;
   final borderRadius = BorderRadius.all(Radius.circular(9.0));
+  String getEventNetworkImage = "";
 
   @override
   void initState() {
@@ -62,7 +65,57 @@ class _AddEventDialogState extends State<AddEventDialog> {
       timeCont.text = widget.event!.time;
       descriptionCont.text = widget.event!.description;
       monoCont.text = widget.event!.mono;
+      getEventNetworkImage = widget.event!.eventImages.isNotEmpty ? widget.event!.eventImages[0] : "";
     }
+  }
+
+  pickEventImage() async {
+    eventImage = null;
+    eventImage = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 100);
+    eventImageList = await eventImage!.readAsBytes();
+    setState(() {});
+  }
+
+  Widget getEventsImage() {
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: getEventNetworkImage.isNotEmpty
+            ? InkWell(
+                onTap: () {
+                  pickEventImage();
+                },
+                child: Image.network(
+                  getEventNetworkImage,
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                ),
+              )
+            : eventImageList == null
+                ? SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0), side: BorderSide(color: Colors.white12)),
+                          elevation: 0,
+                          backgroundColor: Colors.grey.shade200,
+                          shadowColor: Colors.transparent),
+                      child: Text("Upload Image", style: boldTextStyle(color: Colors.grey, size: 12)),
+                      onPressed: () {
+                        pickEventImage();
+                      },
+                    ),
+                  )
+                : InkWell(
+                    onTap: () {
+                      pickEventImage();
+                    },
+                    child: Image.memory(eventImageList!,
+                        height: 100, width: 100, fit: BoxFit.cover, alignment: Alignment.center),
+                  ));
   }
 
   AddEventApi() async {
@@ -80,16 +133,6 @@ class _AddEventDialogState extends State<AddEventDialog> {
         "mono": monoCont.text.trim().toString(),
       };
       print('reqAddEvent ::${data.toString()}');
-      await addEvent(req: data).then((value) {
-        appStore.setLoading(false);
-        if (value.status == true) {
-          ToastUtils.showCustomToast(context, value.message, "success");
-
-          Navigator.pushNamed(context, GetAllEventsScreen.route);
-        } else {
-          ToastUtils.showCustomToast(context, value.message, "warning");
-        }
-      });
     }
   }
 
@@ -97,27 +140,18 @@ class _AddEventDialogState extends State<AddEventDialog> {
     if (_formKey.currentState!.validate()) {
       appStore.setLoading(true);
 
-      Map<String, dynamic> data = {
-        "eventId": widget.event!.id.trim(),
-        "title": titleCont.text.trim().toString(),
-        "location": locationCont.text.trim().toString(),
-        "lattitude": lattitudeCont.text.trim().toString(),
-        "longtitude": longtitudeCont.text.trim().toString(),
-        "eventDate": eventDateCont.text.trim().toString(),
-        "time": timeCont.text.trim().toString(),
-        "description": descriptionCont.text.trim().toString(),
-        "mono": monoCont.text.trim().toString(),
-      };
-      print('reqUpdateEvent :::${data.toString()}');
-      await updateEvent(req: data).then((value) {
-        appStore.setLoading(false);
-        if (value.status == true) {
-          ToastUtils.showCustomToast(context, value.message, "success");
-          Navigator.pushNamed(context, GetAllEventsScreen.route);
-        } else {
-          ToastUtils.showCustomToast(context, value.message, "warning");
-        }
-      });
+      await updateEvent(
+          eventId: widget.event!.id.trim(),
+          title: titleCont.text.trim().toString(),
+          location: locationCont.text.trim().toString(),
+          lattitude: lattitudeCont.text.trim().toString(),
+          longtitude: longtitudeCont.text.trim().toString(),
+          eventDate: eventDateCont.text.trim().toString(),
+          time: timeCont.text.trim().toString(),
+          description: descriptionCont.text.trim().toString(),
+          mono: monoCont.text.trim().toString(),
+          eventImages: eventImageList != null ? [eventImageList!] : [],
+          context: context);
     }
   }
 
@@ -187,14 +221,9 @@ class _AddEventDialogState extends State<AddEventDialog> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Image", style: primaryTextStyle()),
+                                  Text("Event Image", style: primaryTextStyle()),
                                   SizedBox(height: 8),
-                                  Container(
-                                    height: 200,
-                                    width: 200,
-                                    // decoration: BoxDecoration(image: DecorationImage(image:)),
-                                    color: Colors.grey.shade300,
-                                  )
+                                  getEventsImage()
                                 ],
                               ),
                             ),
@@ -249,21 +278,15 @@ class _AddEventDialogState extends State<AddEventDialog> {
                                                 showOnlyCountryWhenClosed: false,
                                                 alignLeft: false,
                                                 textStyle: primaryTextStyle(),
-                                                dialogBackgroundColor: Theme
-                                                    .of(context)
-                                                    .cardColor,
+                                                dialogBackgroundColor: Theme.of(context).cardColor,
                                                 barrierColor: Colors.black12,
                                                 dialogTextStyle: primaryTextStyle(),
                                                 searchDecoration: InputDecoration(
-                                                  iconColor: Theme
-                                                      .of(context)
-                                                      .dividerColor,
+                                                  iconColor: Theme.of(context).dividerColor,
                                                   enabledBorder: UnderlineInputBorder(
-                                                      borderSide: BorderSide(color: Theme
-                                                          .of(context)
-                                                          .dividerColor)),
+                                                      borderSide: BorderSide(color: Theme.of(context).dividerColor)),
                                                   focusedBorder:
-                                                  UnderlineInputBorder(borderSide: BorderSide(color: primaryColor)),
+                                                      UnderlineInputBorder(borderSide: BorderSide(color: primaryColor)),
                                                 ),
                                                 searchStyle: primaryTextStyle(),
                                                 onInit: (c) {
@@ -280,9 +303,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                                     validator: (value) {
                                       if (value!.trim().isEmpty) {
                                         return errorThisFieldRequired;
-                                      } else if (value
-                                          .trim()
-                                          .length != 10) {
+                                      } else if (value.trim().length != 10) {
                                         return error10digit;
                                       }
                                       return null;
@@ -353,7 +374,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                                       setState(() {});
                                     },
                                     decoration:
-                                    commonInputDecoration(suffixIcon: Icon(Icons.date_range), hintText: "Date"),
+                                        commonInputDecoration(suffixIcon: Icon(Icons.date_range), hintText: "Date"),
                                   ),
                                 ],
                               ),

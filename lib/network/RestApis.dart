@@ -10,6 +10,7 @@ import 'package:find_me_admin/models/places/res_get_all_place.dart';
 import 'package:find_me_admin/models/user_model/res_add_user.dart';
 import 'package:find_me_admin/screens/Admin/get_users_screen.dart';
 import 'package:find_me_admin/utils/Extensions/shared_pref.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:find_me_admin/models/billing/add_billing/req_billing_data.dart';
@@ -245,16 +246,102 @@ Future<CommonResponse> deleteUserApi({required String userId}) async {
 }
 
 /// event data
-Future<CommonResponse> addEvent({required dynamic req}) async {
-  print('req: ${req}');
-  return CommonResponse.fromJson(
-      await handleResponse(await buildHttpResponse('events/addEvent', request: req, method: HttpMethod.POST)));
+Future addEvent({
+  required String eventId,
+  required String title,
+  required String location,
+  required String lattitude,
+  required String longtitude,
+  required String eventDate,
+  required String time,
+  required String description,
+  required String mono,
+  required List<Uint8List> eventImages,
+  required BuildContext context,
+}) async {
+  MultipartRequest multiPartRequest = await getMultiPartRequest('events/updateEvent');
+  multiPartRequest.fields['eventId'] = eventId;
+  multiPartRequest.fields['title'] = title;
+  multiPartRequest.fields['location'] = location;
+  multiPartRequest.fields['lattitude'] = lattitude;
+  multiPartRequest.fields['longtitude'] = longtitude;
+  multiPartRequest.fields['eventDate'] = eventDate;
+  multiPartRequest.fields['time'] = time;
+  multiPartRequest.fields['description'] = description;
+  multiPartRequest.fields['mono'] = mono;
+
+  if (eventImages.isNotEmpty) {
+    multiPartRequest.files.add(MultipartFile.fromBytes('eventImages', eventImages[0],
+        filename: DateTime.now().microsecondsSinceEpoch.toString() + ".png"));
+  }
+
+  await sendMultiPartRequest(multiPartRequest, onSuccess: (data) async {
+    appStore.setLoading(false);
+    if (data != null) {
+      CommonResponse res = CommonResponse.fromJson(data);
+
+      print("Response updateInquiry --> ${res.toJson()}");
+      if (res.status == true) {
+        ToastUtils.showCustomToast(context, res.message, "success");
+
+        Navigator.pushNamed(context, GetUsersScreen.route);
+      } else {
+        ToastUtils.showCustomToast(context, res.message, "warning");
+      }
+    }
+    return data;
+  }, onError: (error) {
+    ToastUtils.showCustomToast(context, error.toString(), "warning");
+  }, isHeader: true);
 }
 
-Future<CommonResponse> updateEvent({required dynamic req}) async {
-  print('req ::${req.toString()}');
-  return CommonResponse.fromJson(
-      await handleResponse(await buildHttpResponse('events/updateEvent', request: req, method: HttpMethod.POST)));
+Future updateEvent({
+  required String eventId,
+  required String title,
+  required String location,
+  required String lattitude,
+  required String longtitude,
+  required String eventDate,
+  required String time,
+  required String description,
+  required String mono,
+  required List<Uint8List> eventImages,
+  required BuildContext context,
+}) async {
+  MultipartRequest multiPartRequest = await getMultiPartRequest('events/updateEvent');
+  multiPartRequest.fields['eventId'] = eventId;
+  multiPartRequest.fields['title'] = title;
+  multiPartRequest.fields['location'] = location;
+  multiPartRequest.fields['lattitude'] = lattitude;
+  multiPartRequest.fields['longtitude'] = longtitude;
+  multiPartRequest.fields['eventDate'] = eventDate;
+  multiPartRequest.fields['time'] = time;
+  multiPartRequest.fields['description'] = description;
+  multiPartRequest.fields['mono'] = mono;
+
+  if (eventImages.isNotEmpty) {
+    multiPartRequest.files.add(MultipartFile.fromBytes('eventImages', eventImages[0],
+        filename: DateTime.now().microsecondsSinceEpoch.toString() + ".png"));
+  }
+
+  await sendMultiPartRequest(multiPartRequest, onSuccess: (data) async {
+    appStore.setLoading(false);
+    if (data != null) {
+      CommonResponse res = CommonResponse.fromJson(data);
+
+      print("Response updateInquiry --> ${res.toJson()}");
+      if (res.status == true) {
+        ToastUtils.showCustomToast(context, res.message, "success");
+
+        Navigator.pushNamed(context, GetUsersScreen.route);
+      } else {
+        ToastUtils.showCustomToast(context, res.message, "warning");
+      }
+    }
+    return data;
+  }, onError: (error) {
+    ToastUtils.showCustomToast(context, error.toString(), "warning");
+  }, isHeader: true);
 }
 
 Future<ResAllEvents> getAllEvents({
