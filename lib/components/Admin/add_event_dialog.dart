@@ -45,7 +45,6 @@ class _AddEventDialogState extends State<AddEventDialog> {
   Uint8List? eventImageList;
   bool isUpdate = false;
   final borderRadius = BorderRadius.all(Radius.circular(9.0));
-  String getEventNetworkImage = "";
 
   @override
   void initState() {
@@ -65,8 +64,11 @@ class _AddEventDialogState extends State<AddEventDialog> {
       timeCont.text = widget.event!.time;
       descriptionCont.text = widget.event!.description;
       monoCont.text = widget.event!.mono;
-      getEventNetworkImage = widget.event!.eventImages.isNotEmpty ? widget.event!.eventImages[0] : "";
+      if (widget.event!.eventImages.isNotEmpty) {
+        eventImageList = await imageDataURLtoUint8List(mBaseUrl + widget.event!.eventImages[0]);
+      }
     }
+    setState(() {});
   }
 
   pickEventImage() async {
@@ -79,60 +81,47 @@ class _AddEventDialogState extends State<AddEventDialog> {
   Widget getEventsImage() {
     return ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child: getEventNetworkImage.isNotEmpty
+        child: eventImageList != null
             ? InkWell(
                 onTap: () {
                   pickEventImage();
                 },
-                child: Image.network(
-                  getEventNetworkImage,
-                  height: 100,
-                  width: 100,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.center,
-                ),
+                child: Image.memory(eventImageList!,
+                    height: 100, width: 100, fit: BoxFit.cover, alignment: Alignment.center),
               )
-            : eventImageList == null
-                ? SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0), side: BorderSide(color: Colors.white12)),
-                          elevation: 0,
-                          backgroundColor: Colors.grey.shade200,
-                          shadowColor: Colors.transparent),
-                      child: Text("Upload Image", style: boldTextStyle(color: Colors.grey, size: 12)),
-                      onPressed: () {
-                        pickEventImage();
-                      },
-                    ),
-                  )
-                : InkWell(
-                    onTap: () {
-                      pickEventImage();
-                    },
-                    child: Image.memory(eventImageList!,
-                        height: 100, width: 100, fit: BoxFit.cover, alignment: Alignment.center),
-                  ));
+            : SizedBox(
+                width: 100,
+                height: 100,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0), side: BorderSide(color: Colors.white12)),
+                      elevation: 0,
+                      backgroundColor: Colors.grey.shade200,
+                      shadowColor: Colors.transparent),
+                  child: Text("Upload Image", style: boldTextStyle(color: Colors.grey, size: 12)),
+                  onPressed: () {
+                    pickEventImage();
+                  },
+                ),
+              ));
   }
 
   AddEventApi() async {
     if (_formKey.currentState!.validate()) {
       appStore.setLoading(true);
 
-      Map<String, dynamic> data = {
-        "title": titleCont.text.trim().toString(),
-        "location": locationCont.text.trim().toString(),
-        "lattitude": lattitudeCont.text.trim().toString(),
-        "longtitude": longtitudeCont.text.trim().toString(),
-        "eventDate": eventDateCont.text.trim().toString(),
-        "time": timeCont.text.trim().toString(),
-        "description": descriptionCont.text.trim().toString(),
-        "mono": monoCont.text.trim().toString(),
-      };
-      print('reqAddEvent ::${data.toString()}');
+      await addEvent(
+          title: titleCont.text.trim().toString(),
+          location: locationCont.text.trim().toString(),
+          lattitude: lattitudeCont.text.trim().toString(),
+          longtitude: longtitudeCont.text.trim().toString(),
+          eventDate: eventDateCont.text.trim().toString(),
+          time: timeCont.text.trim().toString(),
+          description: descriptionCont.text.trim().toString(),
+          mono: monoCont.text.trim().toString(),
+          eventImages: eventImageList != null ? [eventImageList!] : [],
+          context: context);
     }
   }
 

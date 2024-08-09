@@ -45,6 +45,7 @@ import '../models/places/res_get_userwise_place.dart';
 import '../models/user_model/res_get_all_user.dart';
 import '../models/user_model/res_login_user.dart';
 import '../network/NetworkUtils.dart';
+import '../screens/Admin/get_all_events.dart';
 import '../utils/Extensions/common.dart';
 
 Future<MultipartRequest> getMultiPartRequest(String endPoint, {String? baseUrl}) async {
@@ -247,7 +248,6 @@ Future<CommonResponse> deleteUserApi({required String userId}) async {
 
 /// event data
 Future addEvent({
-  required String eventId,
   required String title,
   required String location,
   required String lattitude,
@@ -259,8 +259,7 @@ Future addEvent({
   required List<Uint8List> eventImages,
   required BuildContext context,
 }) async {
-  MultipartRequest multiPartRequest = await getMultiPartRequest('events/updateEvent');
-  multiPartRequest.fields['eventId'] = eventId;
+  MultipartRequest multiPartRequest = await getMultiPartRequest('events/addEvent');
   multiPartRequest.fields['title'] = title;
   multiPartRequest.fields['location'] = location;
   multiPartRequest.fields['lattitude'] = lattitude;
@@ -284,7 +283,7 @@ Future addEvent({
       if (res.status == true) {
         ToastUtils.showCustomToast(context, res.message, "success");
 
-        Navigator.pushNamed(context, GetUsersScreen.route);
+        Navigator.pushNamed(context, GetAllEventsScreen.route);
       } else {
         ToastUtils.showCustomToast(context, res.message, "warning");
       }
@@ -333,7 +332,7 @@ Future updateEvent({
       if (res.status == true) {
         ToastUtils.showCustomToast(context, res.message, "success");
 
-        Navigator.pushNamed(context, GetUsersScreen.route);
+        Navigator.pushNamed(context, GetAllEventsScreen.route);
       } else {
         ToastUtils.showCustomToast(context, res.message, "warning");
       }
